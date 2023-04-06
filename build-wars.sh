@@ -7,9 +7,7 @@ shopt -s inherit_errexit 2>/dev/null || true
 
 trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
 
-
-clean(){
-
+reset_poms(){
   git checkout orcid-activemq/pom.xml
   git checkout orcid-api-common/pom.xml
   git checkout orcid-api-web/pom.xml
@@ -24,10 +22,6 @@ clean(){
   git checkout orcid-web/pom.xml
   git checkout pom.xml
 
-  mvn clean
-
-  rm -Rf ~/.m2/repository/org/orcid/orcid-model
-  rm -Rf ~/.m2/repository/org/orcid/orcid-test
 
 }
 
@@ -36,22 +30,38 @@ clean(){
 sk-asdf-install-tool-versions
 
 tag=${1:-release-2.0.1}
+tag_numeric=$(echo "$tag" | sed -e 's/release-//g')
 
-clean
+reset_poms
+
+mvn clean
+# rm -Rf ~/.m2/repository/org/orcid/orcid-test
+rm -Rf ~/.m2/repository/org/orcid
 
 ##########
 
-# install orcid-test into our local maven repo because the builds depend a version tagged release
-mvn versions:set -DnewVersion=$tag -DgenerateBackupPoms=false --projects orcid-test clean install
+# bump the tag_numericged version in the poms tied to the parent pom
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false
 
+# bump the tag_numericged version in the poms of projects not tied to the parent pom
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-test
+#mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-utils
+#mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-persistence
 
-mvn versions:set -DnewVersion=$tag -DgenerateBackupPoms=false --projects orcid-message-listener -am package -DskipTests
-mvn versions:set -DnewVersion=$tag -DgenerateBackupPoms=false --projects orcid-activemq -am package -DskipTests
-mvn versions:set -DnewVersion=$tag -DgenerateBackupPoms=false --projects orcid-api-web -am package -DskipTests
-mvn versions:set -DnewVersion=$tag -DgenerateBackupPoms=false --projects orcid-internal-api -am package -DskipTests
-mvn versions:set -DnewVersion=$tag -DgenerateBackupPoms=false --projects orcid-pub-web -am package -DskipTests
-mvn versions:set -DnewVersion=$tag -DgenerateBackupPoms=false --projects orcid-scheduler-web -am package -DskipTests
-mvn versions:set -DnewVersion=$tag -DgenerateBackupPoms=false --projects orcid-web -am package -DskipTests
+# install orcid-test into our local maven repo because the builds depend a version tag_numericged release
+mvn --projects orcid-test clean install
+
+find ~/.m2/repository/ -name 'orcid*'
+
+sleep 2
+
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-message-listener -am package -DskipTests
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-activemq -am package -DskipTests
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-api-web -am package -DskipTests
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-internal-api -am package -DskipTests
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-pub-web -am package -DskipTests
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-scheduler-web -am package -DskipTests
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-web -am package -DskipTests
 
 
 secs=$SECONDS
@@ -60,5 +70,6 @@ mins=$(( (secs-hrs*3600)/60 ))
 secs=$(( secs-hrs*3600-mins*60 ))
 printf 'Time spent: %02d:%02d:%02d\n' $hrs $mins $secs | tee /var/tmp/build.log
 
-find . -name '*.war' | tee /var/tmp/build.log
+find . -name '*.war' | tee ~/orcid-source-build.log
 
+find ~/.m2/repository/ -name 'orcid*' | tee ~/orcid-source-build.log
