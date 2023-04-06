@@ -27,7 +27,17 @@ reset_poms(){
 
 . ~/work/shellkit/profile.d/shellkit.sh
 
+############################################################
+if [[ ! -d ~/.asdf/plugins/mvnd/ ]];then
+  asdf plugin-add mvnd https://github.com/joschi/asdf-mvnd
+fi
+
 sk-asdf-install-tool-versions
+# set JAVA_HOME
+. ~/.asdf/plugins/java/set-java-home.bash
+_asdf_java_update_java_home
+############################################################
+
 
 tag=${1:-release-2.0.1}
 tag_numeric=$(echo "$tag" | sed -e 's/release-//g')
@@ -55,13 +65,13 @@ find ~/.m2/repository/ -name 'orcid*'
 
 sleep 2
 
-mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-message-listener -am package -DskipTests
-mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-activemq -am package -DskipTests
-mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-api-web -am package -DskipTests
-mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-internal-api -am package -DskipTests
-mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-pub-web -am package -DskipTests
-mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-scheduler-web -am package -DskipTests
-mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-web -am package -DskipTests
+mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-message-listener -am package -DskipTests
+mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-activemq -am package -DskipTests
+mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-api-web -am package -DskipTests
+mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-internal-api -am package -DskipTests
+mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-pub-web -am package -DskipTests
+mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-scheduler-web -am package -DskipTests
+mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-web -am package -DskipTests
 
 
 secs=$SECONDS
