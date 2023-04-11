@@ -102,6 +102,15 @@ jobs:
         env:
           tag_numeric: "${{ steps.version.outputs.version_tag }}"
 
+
+      - name: setup node for angular static file
+        if: ${{ inputs.artifact_name == 'orcid-web' }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.7.0
+
+
+
       - name: build our project
         run: |
           mvn -T 1C --batch-mode -am package -DskipTests \
@@ -110,6 +119,10 @@ jobs:
         env:
           tag_numeric: "${{ steps.version.outputs.version_tag }}"
           project: "${{ inputs.artifact_name }}"
+
+
+###########################################################################################
+
 
       - name: build angular parts if we are building orcid-web
         if: ${{ inputs.artifact_name == 'orcid-web' }}
@@ -128,7 +141,7 @@ jobs:
           echo "$tag_numeric" > ${{ github.workspace }}/orcid-web/target/orcid-web/static/version
 
           echo "Creating the war file"
-          jar -cf -- orcid-web.war *
+          jar -cf orcid-web.war .
 
           # check_error "Creating the orcid-web.war file"
           echo "Moving war file to the target folder"
