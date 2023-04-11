@@ -81,14 +81,14 @@ jobs:
 
       - name: bump version of the parent pom and connected projects
         run: |
-          mvn --batch-mode versions:set \
+          mvn -T 1C --batch-mode versions:set \
               -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
         env:
           tag_numeric: "${{ steps.version.outputs.version_tag }}"
 
       - name: bump the tagged version in the poms of projects not tied to the parent pom (orcid-test)
         run: |
-          mvn --batch-mode versions:set \
+          mvn -T 1C --batch-mode versions:set \
               -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-test
         env:
@@ -96,7 +96,7 @@ jobs:
 
       - name: install orcid-test into our local maven repo because the builds depend a version release
         run: |
-          mvn --batch-mode clean install \
+          mvn -T 1C --batch-mode clean install \
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-test
         env:
