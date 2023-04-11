@@ -56,8 +56,16 @@ jobs:
           key: ${{ runner.os }}-asdf-${{ '**/.tool-versions' }}
           restore-keys: |
             ${{ runner.os }}-asdf-
+
       - name: asdf install
         uses: asdf-vm/actions/install@3dcedf44f74a5d84ca0aacf1e1b0c18649db6f01
+
+      - name: show path
+        run: |
+          echo "$PATH"
+
+#
+
 
 #       - name: import shellkit
 #         uses: ORCID/shellkit-action@main
