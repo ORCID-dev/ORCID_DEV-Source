@@ -45,21 +45,21 @@ jobs:
         with:
           version_tag: ${{ inputs.version_tag }}
 
-      - name: Setup asdf
-        uses: asdf-vm/actions/setup@3dcedf44f74a5d84ca0aacf1e1b0c18649db6f01
-
-      - name: Cache asdf
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.asdf
-          key: ${{ runner.os }}-asdf-${{ '**/.tool-versions' }}
-          restore-keys: |
-            ${{ runner.os }}-asdf-
-
-      - name: asdf install
-        uses: asdf-vm/actions/install@3dcedf44f74a5d84ca0aacf1e1b0c18649db6f01
-
+#       - name: Setup asdf
+#         uses: asdf-vm/actions/setup@3dcedf44f74a5d84ca0aacf1e1b0c18649db6f01
+# 
+#       - name: Cache asdf
+#         uses: actions/cache@v3
+#         with:
+#           path: |
+#             ~/.asdf
+#           key: ${{ runner.os }}-asdf-${{ '**/.tool-versions' }}
+#           restore-keys: |
+#             ${{ runner.os }}-asdf-
+# 
+#       - name: asdf install
+#         uses: asdf-vm/actions/install@3dcedf44f74a5d84ca0aacf1e1b0c18649db6f01
+# 
       - name: Set up Open JDK 11
         uses: actions/setup-java@v3
         with:
@@ -79,27 +79,50 @@ jobs:
           tag_numeric: "${{ steps.version.outputs.version_tag }}"
           project: "${{ inputs.artifact_name }}"
 
-
-      - name: bump version using maven and setup orcid-test
+      - name: bump version of the parent pom and connected projects
         run: |
-          set -o errexit -o errtrace -o nounset -o functrace -o pipefail
-          shopt -s inherit_errexit 2>/dev/null || true
-          trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
-
-          # bump the tagged version in the poms tied to the parent pom
-          mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --batch-mode
-
-          # bump the tagged version in the poms of projects not tied to the parent pom
-          mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects orcid-test --batch-mode
-
-          # install orcid-test into our local maven repo because the builds depend a version release
-          mvn --projects orcid-test clean install --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-
-        shell: bash
+          mvn --batch-mode versions:set \
+              -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
         env:
-          tag_numeric: "${{ steps.version.outputs.version_tag_no_v }}"
-          project: "${{ inputs.artifact_name }}"
+          tag_numeric: "${{ steps.version.outputs.version_tag }}"
 
+      - name: bump the tagged version in the poms of projects not tied to the parent pom (orcid-test)
+        run: |
+          mvn --batch-mode versions:set \
+              -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-test
+        env:
+          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+
+      - name: install orcid-test into our local maven repo because the builds depend a version release
+        run: |
+          mvn --batch-mode clean install \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-test
+        env:
+          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+
+
+#       - name: bump version using maven and setup orcid-test
+#         run: |
+#           set -o errexit -o errtrace -o nounset -o functrace -o pipefail
+#           shopt -s inherit_errexit 2>/dev/null || true
+#           trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
+# 
+#           # bump the tagged version in the poms tied to the parent pom
+#           mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --batch-mode
+# 
+#           # bump the tagged version in the poms of projects not tied to the parent pom
+#           mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects orcid-test --batch-mode
+# 
+#           # install orcid-test into our local maven repo because the builds depend a version release
+#           mvn --projects orcid-test clean install --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+# 
+#         shell: bash
+#         env:
+#           tag_numeric: "${{ steps.version.outputs.version_tag_no_v }}"
+#           project: "${{ inputs.artifact_name }}"
+# 
 
 #       - name: build project using mvnd
 #         run: |
