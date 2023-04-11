@@ -1,0 +1,37 @@
+repos:
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+  - id: check-added-large-files
+    name: check for added large files
+    description: prevents giant files from being committed.
+    entry: check-added-large-files
+    language: python
+    stages: [commit, push, manual]
+
+#   - repo: https://github.com/koalaman/shellcheck-precommit
+#     rev: v0.9.0
+#     hooks:
+#     -   id: shellcheck
+# 
+
+
+- repo: local # Use a local repository
+  hooks:
+#       - id: actionlint
+#         name: Lint GitHub Actions workflow files
+#         description: Runs actionlint to lint GitHub Actions workflow files
+#         language: system
+#         types: ["yaml"]
+#         files: "^.github/workflows/"
+#         entry: actionlint
+#         verbose: true
+
+  - id: actionlint-docker
+    name: Lint GitHub Actions workflow file Docker
+    description: Runs actionlint Docker image to lint GitHub Actions workflow files
+    language: docker_image
+    types: ["yaml"]
+    files: "^.github/workflows/"
+    entry: rhysd/actionlint:1.6.22
