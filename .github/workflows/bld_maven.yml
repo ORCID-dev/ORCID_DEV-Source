@@ -60,11 +60,38 @@ jobs:
       - name: asdf install
         uses: asdf-vm/actions/install@3dcedf44f74a5d84ca0aacf1e1b0c18649db6f01
 
+      - name: Set up Open JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
+
       - name: show path
         run: |
           echo "$PATH"
+          which java
 
-#
+#       - name: build using maven
+#         run: |
+#           # bump the tagged version in the poms tied to the parent pom
+#           mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false
+# 
+#           # bump the tagged version in the poms of projects not tied to the parent pom
+#           mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-test
+#           #mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-utils
+#           #mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-persistence
+# 
+#           # install orcid-test into our local maven repo because the builds depend a version tag_numericged release
+#           mvn --projects orcid-test clean install
+# 
+#           echo "$PATH"
+#         shell: bash
+#         env:
+#           tag_numeric: ${{ steps.version.outputs.version_tag }}
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+# 
+# 
 
 
 #       - name: import shellkit
