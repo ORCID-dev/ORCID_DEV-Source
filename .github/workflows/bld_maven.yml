@@ -80,15 +80,15 @@ jobs:
           trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
 
           # bump the tagged version in the poms tied to the parent pom
-          mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false
+          mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --batch-mode
 
           # bump the tagged version in the poms of projects not tied to the parent pom
-          mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects orcid-test
+          mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects orcid-test --batch-mode
 
           # install orcid-test into our local maven repo because the builds depend a version release
-          mvn --projects orcid-test clean install
+          mvn --projects orcid-test clean install --batch-mode
 
-          mvnd versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects "$project" -am package -DskipTests
+          mvnd versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects "$project" -am package -DskipTests --batch-mode
 
         shell: bash
         env:
