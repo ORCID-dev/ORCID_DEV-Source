@@ -102,6 +102,15 @@ jobs:
         env:
           tag_numeric: "${{ steps.version.outputs.version_tag }}"
 
+      - name: build our project
+        run: |
+          mvn -T 1C --batch-mode -am package -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects "$project"
+        env:
+          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+          project: "${{ inputs.artifact_name }}"
+
 
 #       - name: bump version using maven and setup orcid-test
 #         run: |
@@ -121,7 +130,7 @@ jobs:
 #         shell: bash
 #         env:
 #           tag_numeric: "${{ steps.version.outputs.version_tag_no_v }}"
-#           project: "${{ inputs.artifact_name }}"
+
 # 
 
 #       - name: build project using mvnd
