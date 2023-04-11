@@ -72,6 +72,13 @@ jobs:
           echo "$PATH"
           which java
           echo "$JAVA_HOME"
+          echo "$tag_numeric"
+          echo "$project"
+        shell: bash
+        env:
+          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+          project: "${{ inputs.artifact_name }}"
+
 
       - name: bump version using maven and setup orcid-test
         run: |
@@ -94,19 +101,19 @@ jobs:
           project: "${{ inputs.artifact_name }}"
 
 
-      - name: build project using mvnd
-        run: |
-          set -o errexit -o errtrace -o nounset -o functrace -o pipefail
-          shopt -s inherit_errexit 2>/dev/null || true
-          trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
-
-          mvnd versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects "$project" -am package -DskipTests --batch-mode
-
-        shell: bash
-        env:
-          tag_numeric: "${{ steps.version.outputs.version_tag_no_v }}"
-          project: "${{ inputs.artifact_name }}"
-
+#       - name: build project using mvnd
+#         run: |
+#           set -o errexit -o errtrace -o nounset -o functrace -o pipefail
+#           shopt -s inherit_errexit 2>/dev/null || true
+#           trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
+# 
+#           mvnd versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects "$project" -am package -DskipTests --batch-mode
+# 
+#         shell: bash
+#         env:
+#           tag_numeric: "${{ steps.version.outputs.version_tag_no_v }}"
+#           project: "${{ inputs.artifact_name }}"
+# 
 
 
 
