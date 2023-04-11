@@ -111,6 +111,36 @@ jobs:
           tag_numeric: "${{ steps.version.outputs.version_tag }}"
           project: "${{ inputs.artifact_name }}"
 
+      - name: build angular parts if we are building orcid-web
+        if: ${{ inputs.artifact_name == 'orcid-web' }}
+        run: |
+          echo "Build angular_orcid_generated.js"
+          cd orcid-nodejs
+          mvn -T 1C --batch-mode -P ci clean compile -Dnodejs.workingDirectory="${{ github.workspace }}/orcid-web/src/main/webapp/static/javascript/ng1Orcid"
+
+          echo "Copying angular_orcid_generated to its final destination"
+          cp ${{ github.workspace }}/orcid-web/src/main/webapp/static/javascript/ng1Orcid/angular_orcid_generated.js ${{ github.workspace }}/orcid-web/target/orcid-web/static/javascript/ng1Orcid/
+
+          echo "Packaging orcid-web"
+          rm -f ${{ github.workspace }}/orcid-web/target/orcid-web.war
+          cd ${{ github.workspace }}/orcid-web/target/orcid-web
+
+          echo "$tag_numeric" > ${{ github.workspace }}/orcid-web/target/orcid-web/static/version
+
+          echo "Creating the war file"
+
+          # check_error "Creating the orcid-web.war file"
+          echo "Moving war file to the target folder"
+          cp orcid-web.war ${{ github.workspace }}/orcid-web/target/
+          echo "orcid-web.war is ready"
+
+        env:
+          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+          project: "${{ inputs.artifact_name }}"
+
+
+
+
 
 #       - name: bump version using maven and setup orcid-test
 #         run: |
