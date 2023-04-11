@@ -76,6 +76,8 @@ jobs:
       - name: build using maven
         run: |
           set -o errexit -o errtrace -o nounset -o functrace -o pipefail
+          shopt -s inherit_errexit 2>/dev/null || true
+          trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
 
           # bump the tagged version in the poms tied to the parent pom
           mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false
