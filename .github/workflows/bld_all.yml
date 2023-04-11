@@ -1,0 +1,39 @@
+name: bld_all
+
+permissions:
+  checks: write
+  contents: read
+  issues: read
+  pull-requests: write
+
+on:
+  workflow_call:
+    inputs:
+      version_tag:
+        description: 'version tag to use'
+        required: false
+        default: "next_tag"
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'version tag to use'
+        required: false
+        default: "next_tag"
+        type: string
+
+jobs:
+
+  bld_ml:
+    uses: ./.github/workflows/bld_maven.yml
+    secrets: inherit # pass all secrets
+    permissions:
+      checks: write
+      contents: read
+      issues: read
+      pull-requests: write
+    with:
+      artifact_name: orcid-message-listener
+      version_tag: ${{ inputs.version_tag }}
+
