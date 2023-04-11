@@ -71,6 +71,7 @@ jobs:
         run: |
           echo "$PATH"
           which java
+          echo "$JAVA_HOME"
 
 #       - name: build using maven
 #         run: |
