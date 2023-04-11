@@ -86,7 +86,7 @@ jobs:
           mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects orcid-test --batch-mode
 
           # install orcid-test into our local maven repo because the builds depend a version release
-          mvn --projects orcid-test clean install --batch-mode
+          mvn --projects orcid-test clean install --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
         shell: bash
         env:
