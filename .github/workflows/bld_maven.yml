@@ -182,7 +182,7 @@ jobs:
 
       - name: deploy war file
         run: |
-          mvn -X --batch-mode \
+          mvn --batch-mode \
               --settings settings-deploy.xml \
               --file "${project}/pom.xml" \
               -Dmaven.test.skip \
