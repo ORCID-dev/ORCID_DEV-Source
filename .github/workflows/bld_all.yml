@@ -37,3 +37,80 @@ jobs:
       artifact_name: orcid-message-listener
       version_tag: ${{ inputs.version_tag }}
 
+  bld_amq:
+    uses: ./.github/workflows/bld_maven.yml
+    secrets: inherit # pass all secrets
+    permissions:
+      checks: write
+      contents: read
+      issues: read
+      pull-requests: write
+    with:
+      artifact_name: orcid-activemq
+      version_tag: ${{ inputs.version_tag }}
+
+  bld_api:
+    uses: ./.github/workflows/bld_maven.yml
+    secrets: inherit # pass all secrets
+    permissions:
+      checks: write
+      contents: read
+      issues: read
+      pull-requests: write
+    with:
+      artifact_name: orcid-api-web
+      version_tag: ${{ inputs.version_tag }}
+
+  bld_iapi:
+    uses: ./.github/workflows/bld_maven.yml
+    secrets: inherit # pass all secrets
+    permissions:
+      checks: write
+      contents: read
+      issues: read
+      pull-requests: write
+    with:
+      artifact_name: orcid-internal-api
+      version_tag: ${{ inputs.version_tag }}
+
+  bld_pubweb:
+    uses: ./.github/workflows/bld_maven.yml
+    secrets: inherit # pass all secrets
+    permissions:
+      checks: write
+      contents: read
+      issues: read
+      pull-requests: write
+    with:
+      artifact_name: orcid-pub-web
+      version_tag: ${{ inputs.version_tag }}
+
+  bld_sched:
+    uses: ./.github/workflows/bld_maven.yml
+    secrets: inherit # pass all secrets
+    permissions:
+      checks: write
+      contents: read
+      issues: read
+      pull-requests: write
+    with:
+      artifact_name: orcid-scheduler-web
+      version_tag: ${{ inputs.version_tag }}
+
+  bld_web:
+    uses: ./.github/workflows/bld_maven.yml
+    secrets: inherit # pass all secrets
+    permissions:
+      checks: write
+      contents: read
+      issues: read
+      pull-requests: write
+    with:
+      artifact_name: orcid-web
+      version_tag: ${{ inputs.version_tag }}
+
+
+
+
+
+
