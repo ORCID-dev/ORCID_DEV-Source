@@ -39,8 +39,8 @@ _asdf_java_update_java_home
 ############################################################
 
 
-tag=${1:-release-2.0.1}
-tag_numeric=$(echo "$tag" | sed -e 's/release-//g')
+tag=${1:-v2.0.1}
+tag_numeric=$(echo "$tag" | tr -dc '[:digit:].')
 
 reset_poms
 
@@ -50,16 +50,23 @@ rm -Rf ~/.m2/repository/org/orcid
 
 ##########
 
-# bump the tag_numericged version in the poms tied to the parent pom
+# bump the tagged version in the poms tied to the parent pom
 mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false
 
-# bump the tag_numericged version in the poms of projects not tied to the parent pom
+# bump the tagged version in the poms of projects not tied to the parent pom
 mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-test
 #mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-utils
 #mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-persistence
 
-# install orcid-test into our local maven repo because the builds depend a version tag_numericged release
+# install orcid-test into our local maven repo because the builds depend a version tagged release
 mvn --projects orcid-test clean install
+
+# install orcid-test into our local maven repo because the builds depend a version tagged release
+mvn --projects orcid-utils clean install
+
+# install orcid-parent into our local maven repo because the builds depend a version tagged release
+mvn --non-recursive clean install
+
 
 find ~/.m2/repository/ -name 'orcid*'
 
