@@ -1,5 +1,5 @@
 name: bld_maven
-run-name: "bld-{{ inputs.artifact_name }}"
+run-name: bld-{{ inputs.artifact_name }}
 
 permissions:
   checks: write
@@ -114,6 +114,10 @@ jobs:
           mvn -T 1C --batch-mode -am package -DskipTests \
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects "$project"
+          echo "------------------------------------------------------"
+
+          find . -name '*.war'
+          find . -name '*.jar'
         env:
           project: "${{ inputs.artifact_name }}"
 
