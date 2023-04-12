@@ -102,6 +102,14 @@ jobs:
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
+      - name: install orcid-core into our local maven repo because the builds depend a version release
+        run: |
+          mvn -T 1C --batch-mode clean install \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-core
+        env:
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
+
       - name: install orcid-parent into our local maven repo because the builds depend a version release
         run: |
           mvn -T 1C --batch-mode --non-recursive clean install \
