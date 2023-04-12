@@ -1,4 +1,5 @@
 name: bld_maven
+run-name: "bld-{{ inputs.artifact_name }}"
 
 permissions:
   checks: write
@@ -45,21 +46,6 @@ jobs:
         with:
           version_tag: ${{ inputs.version_tag }}
 
-#       - name: Setup asdf
-#         uses: asdf-vm/actions/setup@3dcedf44f74a5d84ca0aacf1e1b0c18649db6f01
-# 
-#       - name: Cache asdf
-#         uses: actions/cache@v3
-#         with:
-#           path: |
-#             ~/.asdf
-#           key: ${{ runner.os }}-asdf-${{ '**/.tool-versions' }}
-#           restore-keys: |
-#             ${{ runner.os }}-asdf-
-# 
-#       - name: asdf install
-#         uses: asdf-vm/actions/install@3dcedf44f74a5d84ca0aacf1e1b0c18649db6f01
-# 
       - name: Set up Open JDK 11
         uses: actions/setup-java@v3
         with:
@@ -76,38 +62,36 @@ jobs:
           echo "$project"
         shell: bash
         env:
-          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
           project: "${{ inputs.artifact_name }}"
 
       - name: populate orcid-persistence/src/main/resources/release_name.txt with numeric tag
         run: |
-          echo "$tag_numeric" > orcid-persistence/src/main/resources/release_name.txt
+          echo "$version_tag_numeric" > orcid-persistence/src/main/resources/release_name.txt
         env:
-          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
       - name: bump version of the parent pom and connected projects
         run: |
           mvn -T 1C --batch-mode versions:set \
-              -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
         env:
-          tag_numeric: "${{ steps.version.outputs.version_tag }}"
-
-
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
       - name: bump version of the parent pom and connected projects
         run: |
           mvn -T 1C --batch-mode versions:set \
-              -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
         env:
-          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
       - name: bump the tagged version in the poms of projects not tied to the parent pom (orcid-test)
         run: |
           mvn -T 1C --batch-mode versions:set \
-              -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-test
         env:
-          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
       - name: install orcid-test into our local maven repo because the builds depend a version release
         run: |
@@ -115,7 +99,7 @@ jobs:
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-test
         env:
-          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
       - name: check some build related things
         run: |
@@ -123,14 +107,7 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git status
-        env:
-          tag_numeric: "${{ steps.version.outputs.version_tag }}"
-
-      - name: setup node for angular static file
-        if: ${{ inputs.artifact_name == 'orcid-web' }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.7.0
+          git diff
 
       - name: build our project
         run: |
@@ -138,10 +115,17 @@ jobs:
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects "$project"
         env:
-          tag_numeric: "${{ steps.version.outputs.version_tag }}"
           project: "${{ inputs.artifact_name }}"
 
-###########################################################################################
+#
+# orcid-web customization
+#
+      - name: setup node for angular static file
+        if: ${{ inputs.artifact_name == 'orcid-web' }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.7.0
+
 
       - name: build angular parts if we are building orcid-web
         if: ${{ inputs.artifact_name == 'orcid-web' }}
@@ -159,7 +143,8 @@ jobs:
           rm -f ${{ github.workspace }}/orcid-web/target/orcid-web.war
           cd ${{ github.workspace }}/orcid-web/target/orcid-web
 
-          echo "$tag_numeric" > ${{ github.workspace }}/orcid-web/target/orcid-web/static/version
+          # have a file on the webserver we can hit
+          echo "$version_tag_numeric" > ${{ github.workspace }}/orcid-web/target/orcid-web/static/version
 
           echo "Creating the war file"
           jar -cf orcid-web.war .
@@ -170,8 +155,11 @@ jobs:
           echo "orcid-web.war is ready"
 
         env:
-          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
           project: "${{ inputs.artifact_name }}"
+
+##################################################################################################################
+
 
       - name: deploy war file
         run: |
@@ -188,59 +176,4 @@ jobs:
           ARTIFACT_USER: "${{ secrets.ARTIFACT_USER }}"
           ARTIFACT_PASSWORD: "${{ secrets.ARTIFACT_PASSWORD }}"
           project: "${{ inputs.artifact_name }}"
-
-
-
-
-
-
-#       - name: bump version using maven and setup orcid-test
-#         run: |
-#           set -o errexit -o errtrace -o nounset -o functrace -o pipefail
-#           shopt -s inherit_errexit 2>/dev/null || true
-#           trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
-# 
-#           # bump the tagged version in the poms tied to the parent pom
-#           mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --batch-mode
-# 
-#           # bump the tagged version in the poms of projects not tied to the parent pom
-#           mvn versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects orcid-test --batch-mode
-# 
-#           # install orcid-test into our local maven repo because the builds depend a version release
-#           mvn --projects orcid-test clean install --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-# 
-#         shell: bash
-#         env:
-#           tag_numeric: "${{ steps.version.outputs.version_tag_no_v }}"
-
-# 
-
-#       - name: build project using mvnd
-#         run: |
-#           set -o errexit -o errtrace -o nounset -o functrace -o pipefail
-#           shopt -s inherit_errexit 2>/dev/null || true
-#           trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
-# 
-#           mvnd versions:set -DnewVersion="$tag_numeric" -DgenerateBackupPoms=false --projects "$project" -am package -DskipTests --batch-mode
-# 
-#         shell: bash
-#         env:
-#           tag_numeric: "${{ steps.version.outputs.version_tag_no_v }}"
-#           project: "${{ inputs.artifact_name }}"
-# 
-
-
-
-
-#       - name: import shellkit
-#         uses: ORCID/shellkit-action@main
-# 
-
-# 
-#       - name: test shellkit github functions
-#         run: |
-#           . /opt/shellkit/profile.d/shellkit.sh
-# 
-           
-
 
