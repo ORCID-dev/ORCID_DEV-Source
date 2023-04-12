@@ -140,12 +140,21 @@ jobs:
 #
 # orcid-web customization
 #
+
       - name: setup node for angular static file
         if: ${{ inputs.artifact_name == 'orcid-web' }}
         uses: actions/setup-node@v3
         with:
           node-version: 18.7.0
 
+      - name: install orcid-api-common into our local maven repo because the deploy depends on this
+        if: ${{ inputs.artifact_name == 'orcid-web' }}
+        run: |
+          mvn -T 1C --batch-mode clean install \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-api-common
+        env:
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
       - name: build angular parts if we are building orcid-web
         if: ${{ inputs.artifact_name == 'orcid-web' }}
