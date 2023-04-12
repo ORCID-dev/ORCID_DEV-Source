@@ -86,9 +86,16 @@ jobs:
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
+      - name: install orcid-parent into our local maven repo because the builds depend a version release
+        run: |
+          mvn -T 1C --batch-mode --non-recursive clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+        env:
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
+
       - name: install orcid-test into our local maven repo because the builds depend a version release
         run: |
-          mvn -T 1C --batch-mode clean install \
+          mvn -T 1C --batch-mode clean install -DskipTests\
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-test
         env:
@@ -96,7 +103,7 @@ jobs:
 
       - name: install orcid-utils into our local maven repo because the builds depend a version release
         run: |
-          mvn -T 1C --batch-mode clean install \
+          mvn -T 1C --batch-mode clean install -DskipTests \
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-utils
         env:
@@ -104,7 +111,7 @@ jobs:
 
       - name: install orcid-persistence into our local maven repo because orcid-core depends on it
         run: |
-          mvn -T 1C --batch-mode clean install \
+          mvn -T 1C --batch-mode clean install -DskipTests \
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-persistence
         env:
@@ -112,16 +119,9 @@ jobs:
 
       - name: install orcid-core into our local maven repo because the builds depend a version release
         run: |
-          mvn -T 1C --batch-mode clean install \
+          mvn -T 1C --batch-mode clean install -DskipTests \
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-core
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-
-      - name: install orcid-parent into our local maven repo because the builds depend a version release
-        run: |
-          mvn -T 1C --batch-mode --non-recursive clean install \
-              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
@@ -158,7 +158,7 @@ jobs:
       - name: install orcid-api-common into our local maven repo because the deploy depends on this
         if: ${{ inputs.artifact_name == 'orcid-web' }}
         run: |
-          mvn -T 1C --batch-mode clean install \
+          mvn -T 1C --batch-mode clean install -DskipTests \
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-api-common
         env:
