@@ -58,15 +58,20 @@ mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects
 #mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-utils
 #mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-persistence
 
-# install orcid-test into our local maven repo because the builds depend a version tagged release
-mvn --projects orcid-test clean install
-
-# install orcid-test into our local maven repo because the builds depend a version tagged release
-mvn --projects orcid-utils clean install
-
 # install orcid-parent into our local maven repo because the builds depend a version tagged release
-mvn --non-recursive clean install
+mvn --non-recursive clean install -DskipTests
 
+# install orcid-test into our local maven repo because the builds depend a version tagged release
+mvn --projects orcid-test clean install -DskipTests
+
+# install orcid-utils into our local maven repo because the builds depend a version tagged release
+mvn --projects orcid-utils clean install -DskipTests
+
+# install orcid-persistence into our local maven repo because orcid-core depends on it
+mvn --projects orcid-persistence clean install -DskipTests
+
+# install orcid-core into our local maven repo because the builds depend a version tagged release
+mvn --projects orcid-core clean install -DskipTests
 
 find ~/.m2/repository/ -name 'orcid*'
 
@@ -80,6 +85,8 @@ mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --project
 mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-scheduler-web -am package -DskipTests
 mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-web -am package -DskipTests
 
+# install orcid-api-common into our local maven repo because orcid-web deploy depends a version tagged release
+mvn --projects orcid-api-common clean install -DskipTests
 
 secs=$SECONDS
 hrs=$(( secs/3600 ))
