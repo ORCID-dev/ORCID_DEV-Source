@@ -8,7 +8,7 @@ shopt -s inherit_errexit 2>/dev/null || true
 
 trap 'echo "exit_code $? line $LINENO linecallfunc $BASH_COMMAND"' ERR
 
-for service in orcid-message-listener orcid-activemq;do
+for service in orcid-message-listener orcid-activemq orcid-api-web orcid-internal-api orcid-pub-web orcid-scheduler-web orcid-web;do
 
   mvn --batch-mode \
       --settings settings-deploy.xml \
