@@ -102,6 +102,15 @@ jobs:
         env:
           tag_numeric: "${{ steps.version.outputs.version_tag }}"
 
+      - name: check some build related things
+        run: |
+          git --version
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git status
+        env:
+          tag_numeric: "${{ steps.version.outputs.version_tag }}"
+
       - name: setup node for angular static file
         if: ${{ inputs.artifact_name == 'orcid-web' }}
         uses: actions/setup-node@v3
