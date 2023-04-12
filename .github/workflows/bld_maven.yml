@@ -155,15 +155,6 @@ jobs:
         with:
           node-version: 18.7.0
 
-      - name: install orcid-api-common into our local maven repo because the deploy depends on this
-        if: ${{ inputs.artifact_name == 'orcid-web' }}
-        run: |
-          mvn -T 1C --batch-mode clean install -DskipTests \
-              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-              --projects orcid-api-common
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-
       - name: build angular parts if we are building orcid-web
         if: ${{ inputs.artifact_name == 'orcid-web' }}
         run: |
@@ -196,6 +187,16 @@ jobs:
           project: "${{ inputs.artifact_name }}"
 
 ##################################################################################################################
+
+
+      - name: install orcid-api-common into our local maven repo because the deploy depends on this orcid-web orcid-iapi orcid-api
+        if: ${{ inputs.artifact_name == 'orcid-web' }} || ${{ inputs.artifact_name == 'orcid-internal-api' }} || ${{ inputs.artifact_name == 'orcid-api-web' }} || ${{ inputs.artifact_name == 'orcid-pub-web' }}
+        run: |
+          mvn -T 1C --batch-mode clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-api-common
+        env:
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
 
       - name: deploy war file
