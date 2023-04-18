@@ -85,15 +85,10 @@ sk-arg-check tag
 tag_numeric=$(echo "$tag" | tr -dc '[:digit:].')
 echo_log "building for: $tag_numeric"
 
-reset_poms
-
-mvn clean
-rm -Rf ~/.m2/orcid-source-repo/org/orcid
-
 #
 # setup build environment from .tool-versions
 #
-echo_log "configure build environment for orcid-angular $tag_numeric"
+echo_log "configure build environment for $checkout_name $tag_numeric"
 
 sk-asdf-install-tool-versions
 # set JAVA_HOME
@@ -101,64 +96,70 @@ sk-asdf-install-tool-versions
 _asdf_java_update_java_home
 
 sk-dir-make ~/log
+sk-dir-make ~/.m2/orcid-source-repo/
 
-echo $AWS_SECRET_ID
-# source the secrets for the artifact uploads
-sk-aws-secret-source $AWS_SECRET_ID
+#
+# cleanup
+#
+sleep 2
 
-echo ${ARTIFACT_URL}${ARTIFACT_REPO_PATH}
+echo_log "cleanup for $checkout_name $tag_numeric"
 
-export ARTIFACT_USER=$ARTIFACT_USER
-export ARTIFACT_PASSWORD=$ARTIFACT_PASSWORD
+reset_poms
+
+build_log_general_file=~/log/orcid-source-general-${tag_numeric}.log
+echo_log "general log file: $build_log_general_file"
+
+mvn clean -l $build_log_general_file
+rm -Rf ~/.m2/orcid-source-repo/org/orcid
 
 #
 # build and version bump
 #
 
+sleep 2
+echo_log "bumping versions installing build dependencies into custom local maven repo ~/.m2/orcid-source-repo"
+
 # bump the tagged version in the poms tied to the parent pom
-mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --settings settings-custom.xml -l $build_log_general_file
 
 # bump the tagged version in the poms of projects not tied to the parent pom
-mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-test
+mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-test --settings settings-custom.xml -l $build_log_general_file
 #mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-utils
 #mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-persistence
 
 # install orcid-parent into our local maven repo because the builds depend a version tagged release
-mvn --non-recursive clean install -DskipTests
+mvn --non-recursive clean install -DskipTests --settings settings-custom.xml -l $build_log_general_file
 
 # install orcid-test into our local maven repo because the builds depend a version tagged release
-mvn --projects orcid-test clean install -DskipTests
+mvn --projects orcid-test clean install -DskipTests --settings settings-custom.xml -l $build_log_general_file
 
 # install orcid-utils into our local maven repo because the builds depend a version tagged release
-mvn --projects orcid-utils clean install -DskipTests
+mvn --projects orcid-utils clean install -DskipTests --settings settings-custom.xml -l $build_log_general_file
 
 # install orcid-persistence into our local maven repo because orcid-core depends on it
-mvn --projects orcid-persistence clean install -DskipTests
+mvn --projects orcid-persistence clean install -DskipTests --settings settings-custom.xml -l $build_log_general_file
 
 # install orcid-core into our local maven repo because the builds depend a version tagged release
-mvn --projects orcid-core clean install -DskipTests
+mvn --projects orcid-core clean install -DskipTests --settings settings-custom.xml -l $build_log_general_file
 
-find ~/.m2/repository/ -name 'orcid*'
+find ~/.m2/orcid-source-repo/ -name 'orcid*' | tee -a $build_log_general_file
 
 sleep 2
 
-mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-message-listener -am package -DskipTests
-mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-activemq -am package -DskipTests
-mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-api-web -am package -DskipTests
-mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-internal-api -am package -DskipTests
-mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-pub-web -am package -DskipTests
-mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-scheduler-web -am package -DskipTests
-mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-web -am package -DskipTests
+for project in orcid-message-listener orcid-activemq orcid-api-web orcid-internal-api orcid-pub-web orcid-scheduler-web orcid-web;do
+  build_log_file=~/log/orcid-source-${project}-${tag_numeric}.log
+  echo_log "project build log: $build_log_file"
+  mvnd versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false \
+    --settings settings-custom.xml \
+    --projects $project -am package -DskipTests -l $build_log_file
+done
 
 # install orcid-api-common into our local maven repo because orcid-web deploy depends a version tagged release
-mvn --projects orcid-api-common clean install -DskipTests
+mvn --projects orcid-api-common clean install -DskipTests --settings settings-custom.xml -l $build_log_general_file
 
-secs=$SECONDS
-hrs=$(( secs/3600 ))
-mins=$(( (secs-hrs*3600)/60 ))
-secs=$(( secs-hrs*3600-mins*60 ))
-printf 'Time spent: %02d:%02d:%02d\n' $hrs $mins $secs | tee /var/tmp/build.log
+sk-time-spent
 
-find . -name '*.war' | tee ~/orcid-source-build.log
+find . -name '*.war' | tee -a $build_log_general_file
 
-find ~/.m2/repository/ -name 'orcid*' | tee ~/orcid-source-build.log
+find ~/.m2/orcid-source-repo/ -name 'orcid*' | tee -a $build_log_general_file
