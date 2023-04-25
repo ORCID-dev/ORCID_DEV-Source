@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: $default-branch
+          ref: ${{ github.event.repository.default_branch }}
 
 
       - name: git pull to include any pipeline made changes
