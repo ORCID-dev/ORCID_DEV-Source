@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: $default-branch
+
 
       - name: git pull to include any pipeline made changes
         run: |
