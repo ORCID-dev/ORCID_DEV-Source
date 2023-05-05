@@ -1,0 +1,54 @@
+name: unit_tests_artifact
+
+# Run tests and upload the results as an artifact
+# Can be run from a unprivileged pull_request action
+# Reporting is done in the pr_completed.yml workflow
+
+on:
+  workflow_call:
+    inputs:
+      version_tag:
+        description: 'version tag to use'
+        required: false
+        default: "next_tag"
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'version tag to use'
+        required: false
+        default: "next_tag"
+        type: string
+
+jobs:
+  tst_ml:
+    uses: ./.github/workflows/maven_test_artifact.yml
+    with:
+      context: orcid-message-listener
+
+  tst_amq:
+    uses: ./.github/workflows/maven_test_artifact.yml
+    with:
+      context: orcid-activemq
+
+  tst_api:
+    uses: ./.github/workflows/maven_test_artifact.yml
+    with:
+      context: orcid-api-web
+
+  tst_iapi:
+    uses: ./.github/workflows/maven_test_artifact.yml
+    with:
+      context: orcid-internal-api
+
+  tst_pubweb:
+    uses: ./.github/workflows/maven_test_artifact.yml
+    with:
+      context: orcid-pub-web
+
+  tst_sched:
+    uses: ./.github/workflows/maven_test_artifact.yml
+    with:
+      context: orcid-scheduler-web
+

@@ -10,17 +10,43 @@ on:
   workflow_call:
     inputs:
       version_tag:
-        description: 'version tag to use'
+        description: 'Version tag to use: (bump must also be set to none to keep a specific version'
         required: false
-        default: "next_tag"
+        default: 'latest'
+        type: string
+      bump:
+        description: 'whether to bump the version number by a major minor patch'
+        required: false
+        default: 'patch'
+        type: string
+      ref:
+        description: 'git reference to use with the checkout use default_branch to have that calculated'
+        required: false
+        default: "default"
         type: string
 
   workflow_dispatch:
     inputs:
       version_tag:
-        description: 'version tag to use'
+        description: 'Version tag to use: (bump must also be set to none to keep a specific version'
         required: false
-        default: "next_tag"
+        default: 'latest'
+        type: string
+      bump:
+        description: |
+          How to optionally bump the semver version ( Major.Minor.Patch ) : git log will be searched for
+          '#major #minor #patch' or feat/ or fix/ branch names to optionally override the bump. Set to none to keep a specific version
+        required: false
+        options:
+          - patch
+          - minor
+          - major
+          - none
+        type: choice
+      ref:
+        description: 'git reference to use with the checkout use default_branch to have that calculated'
+        required: false
+        default: "default"
         type: string
 
 jobs:
@@ -36,6 +62,8 @@ jobs:
     with:
       artifact_name: orcid-message-listener
       version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
   bld_amq:
     uses: ./.github/workflows/bld_maven.yml
@@ -48,6 +76,8 @@ jobs:
     with:
       artifact_name: orcid-activemq
       version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
   bld_api:
     uses: ./.github/workflows/bld_maven.yml
@@ -60,6 +90,8 @@ jobs:
     with:
       artifact_name: orcid-api-web
       version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
   bld_iapi:
     uses: ./.github/workflows/bld_maven.yml
@@ -72,6 +104,8 @@ jobs:
     with:
       artifact_name: orcid-internal-api
       version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
   bld_pubweb:
     uses: ./.github/workflows/bld_maven.yml
@@ -84,6 +118,8 @@ jobs:
     with:
       artifact_name: orcid-pub-web
       version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
   bld_sched:
     uses: ./.github/workflows/bld_maven.yml
@@ -96,6 +132,8 @@ jobs:
     with:
       artifact_name: orcid-scheduler-web
       version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
   bld_web:
     uses: ./.github/workflows/bld_maven.yml
@@ -108,7 +146,8 @@ jobs:
     with:
       artifact_name: orcid-web
       version_tag: ${{ inputs.version_tag }}
-
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
 
 

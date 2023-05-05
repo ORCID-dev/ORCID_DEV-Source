@@ -1,0 +1,35 @@
+name: pr
+
+# read-only repo token
+# no access to secrets
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+  workflow_call:
+
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: |
+          Version tag sets the tag for building new assets and tagging the repo.
+          next_tag will bump to the next patch release e.g 0.0.1 -> 0.0.2 .
+          Commit with a message #minor or #major to bump a different amount.
+        required: false
+        default: "next_tag"
+        type: string
+
+# cancel running job if another commit comes in
+concurrency:
+  group: pr-${{ github.ref }}-1
+  cancel-in-progress: true
+
+jobs:
+  unit_tests_artifact:
+    uses: ./.github/workflows/unit_tests_artifact.yml
+
+#   NOTE: codeql is only available on public repos or enterprise github accounts
+#   codeql:
+#     uses: ./.github/workflows/codeql.yml
+#
