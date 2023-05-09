@@ -47,7 +47,7 @@ jobs:
 
       - name: "Test ${{ inputs.context }}"
         run: |
-          mvn --batch-mode -Dmaven.test.failure.ignore=true test \
+          mvn -T 1C --batch-mode -Dmaven.test.failure.ignore=true test \
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects ${{ inputs.context }}
 
