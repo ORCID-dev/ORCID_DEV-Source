@@ -39,9 +39,17 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
+      - name: "install orcid-test"
+        run: |
+          mvn -T 1C --batch-mode install \
+                    -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+                    --projects orcid-test
+
       - name: "Test ${{ inputs.context }}"
-        working-directory: ${{ inputs.context }}
-        run: mvn --batch-mode -Dmaven.test.failure.ignore=true test
+        run: |
+          mvn --batch-mode -Dmaven.test.failure.ignore=true test \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects ${{ inputs.context }}
 
       - uses: actions/upload-artifact@v3  # upload test results
         if: success() || failure()        # run this step even if previous step failed
