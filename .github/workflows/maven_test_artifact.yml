@@ -68,6 +68,13 @@ jobs:
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-core
 
+      - name: install orcid-api-common into our local maven repo because the deploy depends on this orcid-web orcid-iapi orcid-api
+        if: ${{ inputs.artifact_name == 'orcid-web' }} || ${{ inputs.artifact_name == 'orcid-internal-api' }} || ${{ inputs.artifact_name == 'orcid-api-web' }} || ${{ inputs.artifact_name == 'orcid-pub-web' }}
+        run: |
+          mvn -T 1C --batch-mode clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-api-common
+
       - name: "Test ${{ inputs.context }}"
         run: |
           mvn -T 1C --batch-mode -Dmaven.test.failure.ignore=true test \
