@@ -56,6 +56,18 @@ jobs:
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
               --projects orcid-utils
 
+      - name: install orcid-persistence into our local maven repo because orcid-core depends on it
+        run: |
+          mvn -T 1C --batch-mode clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-persistence
+
+      - name: install orcid-core into our local maven repo because the builds depend a version release
+        run: |
+          mvn -T 1C --batch-mode clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-core
+
       - name: "Test ${{ inputs.context }}"
         run: |
           mvn -T 1C --batch-mode -Dmaven.test.failure.ignore=true test \
