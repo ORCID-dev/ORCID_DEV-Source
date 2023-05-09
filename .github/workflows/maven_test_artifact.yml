@@ -45,6 +45,11 @@ jobs:
                     -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
                     --projects orcid-test
 
+      - name: install orcid-parent into our local maven repo because the builds depend a version release
+        run: |
+          mvn -T 1C --batch-mode --non-recursive clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
       - name: install orcid-utils into our local maven repo because the builds depend a version release
         run: |
           mvn -T 1C --batch-mode clean install -DskipTests \
