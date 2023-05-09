@@ -10,15 +10,6 @@ on:
   workflow_call:
 
   workflow_dispatch:
-    inputs:
-      version_tag:
-        description: |
-          Version tag sets the tag for building new assets and tagging the repo.
-          next_tag will bump to the next patch release e.g 0.0.1 -> 0.0.2 .
-          Commit with a message #minor or #major to bump a different amount.
-        required: false
-        default: "next_tag"
-        type: string
 
 # cancel running job if another commit comes in
 concurrency:
