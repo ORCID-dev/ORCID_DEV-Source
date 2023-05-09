@@ -39,11 +39,41 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
-      - name: "install orcid-test"
+      - name: install orcid-test into our local maven repo because the builds depend a version release
         run: |
-          mvn -T 1C --batch-mode install \
+          mvn -T 1C --batch-mode install -DskipTests \
                     -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
                     --projects orcid-test
+
+      - name: install orcid-parent into our local maven repo because the builds depend a version release
+        run: |
+          mvn -T 1C --batch-mode --non-recursive clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+      - name: install orcid-utils into our local maven repo because the builds depend a version release
+        run: |
+          mvn -T 1C --batch-mode clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-utils
+
+      - name: install orcid-persistence into our local maven repo because orcid-core depends on it
+        run: |
+          mvn -T 1C --batch-mode clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-persistence
+
+      - name: install orcid-core into our local maven repo because the builds depend a version release
+        run: |
+          mvn -T 1C --batch-mode clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-core
+
+      - name: install orcid-api-common into our local maven repo because the deploy depends on this orcid-web orcid-iapi orcid-api
+        if: ${{ inputs.artifact_name == 'orcid-web' }} || ${{ inputs.artifact_name == 'orcid-internal-api' }} || ${{ inputs.artifact_name == 'orcid-api-web' }} || ${{ inputs.artifact_name == 'orcid-pub-web' }}
+        run: |
+          mvn -T 1C --batch-mode clean install -DskipTests \
+              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+              --projects orcid-api-common
 
       - name: "Test ${{ inputs.context }}"
         run: |
