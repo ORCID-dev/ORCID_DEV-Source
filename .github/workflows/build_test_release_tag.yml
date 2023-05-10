@@ -74,22 +74,6 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
 
-#   bld_all:
-#     uses: ./.github/workflows/bld_all_matrix.yml
-#     secrets: inherit # pass all secrets for uploading assets
-#     needs:
-#       - lint
-#       - unit_tests_publish
-#     permissions:
-#       checks: write
-#       contents: read
-#       issues: read
-#       pull-requests: write
-#     with:
-#       version_tag: ${{ inputs.version_tag }}
-#       bump: ${{ inputs.bump }}
-#       ref: ${{ inputs.ref }}
-# 
 ##############################################################################
 
   rel_tag:
