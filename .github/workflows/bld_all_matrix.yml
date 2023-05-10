@@ -1,0 +1,71 @@
+name: bld_all_matrix
+
+permissions:
+  checks: write
+  contents: read
+  issues: read
+  pull-requests: write
+
+on:
+  workflow_call:
+    inputs:
+      version_tag:
+        description: 'Version tag to use: (bump must also be set to none to keep a specific version'
+        required: false
+        default: 'latest'
+        type: string
+      bump:
+        description: 'whether to bump the version number by a major minor patch'
+        required: false
+        default: 'patch'
+        type: string
+      ref:
+        description: 'git reference to use with the checkout use default_branch to have that calculated'
+        required: false
+        default: "default"
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version tag to use: (bump must also be set to none to keep a specific version'
+        required: false
+        default: 'latest'
+        type: string
+      bump:
+        description: |
+          How to optionally bump the semver version ( Major.Minor.Patch ) : git log will be searched for
+          '#major #minor #patch' or feat/ or fix/ branch names to optionally override the bump. Set to none to keep a specific version
+        required: false
+        options:
+          - patch
+          - minor
+          - major
+          - none
+        type: choice
+      ref:
+        description: 'git reference to use with the checkout use default_branch to have that calculated'
+        required: false
+        default: "default"
+        type: string
+
+jobs:
+
+  example_matrix:
+    strategy:
+      matrix:
+        # The include keyword that adds a new variable
+        include:
+          - artifact_name: orcid-message-listener
+            version_tag: ${{ inputs.version_tag }}
+            bump: ${{ inputs.bump }}
+            ref: ${{ inputs.ref }}
+          - artifact_name: orcid-web
+            version_tag: ${{ inputs.version_tag }}
+            bump: ${{ inputs.bump }}
+            ref: ${{ inputs.ref }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: blar
+        run: echo "${{ matrix.artifact_name }}"
+
