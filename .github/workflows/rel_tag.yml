@@ -85,7 +85,7 @@ jobs:
         uses: ORCID/changelog-action@main
         with:
           version_tag: ${{ steps.version.outputs.version_tag }}
-          slack_channel: tech-release
+          slack_channel: keyevent-dev
           github_write_token: ${{ secrets.RELEASE_TOKEN }}
           slacktee_token: ${{ secrets.SLACKTEE_TOKEN }}
 
