@@ -51,7 +51,7 @@ on:
 
 jobs:
 
-  build_matrix:
+  bld:
     strategy:
       matrix:
         # The include keyword that adds a new variable
