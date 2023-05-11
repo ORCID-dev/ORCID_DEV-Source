@@ -100,6 +100,8 @@ jobs:
           echo "$JAVA_HOME"
           echo "$tag_numeric"
           echo "$project"
+          find ~/.m2/repository/ -name '*.jar'
+
         shell: bash
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
