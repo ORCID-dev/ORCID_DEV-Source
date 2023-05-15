@@ -90,7 +90,15 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-          cache: 'maven'
+
+      - name: Cache local Maven repository keyed off the last version
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ steps.version.outputs.version_last_numeric }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
 
       - name: show path
         run: |

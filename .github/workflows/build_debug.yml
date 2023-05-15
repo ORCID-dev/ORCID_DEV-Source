@@ -53,6 +53,10 @@ jobs:
 
   install_maven_dependencies:
     uses: ./.github/workflows/install_maven_dependencies.yml
+    with:
+      version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
 ##############################################################################
 
@@ -71,3 +75,4 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       artifact_name: orcid-message-listener
+
