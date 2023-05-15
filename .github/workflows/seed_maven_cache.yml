@@ -114,7 +114,6 @@ jobs:
         shell: bash
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-          version_last_numeric: "${{ steps.version.outputs.version_last_numeric }}"
           project: "${{ inputs.artifact_name }}"
 
       - name: download maven dependencies
