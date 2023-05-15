@@ -119,5 +119,5 @@ jobs:
 
       - name: download maven dependencies
         run: |
-          mvn -T 1C --batch-mode dependency:resolve
+          mvn -T 1C --batch-mode dependency:resolve --fail-never
 
