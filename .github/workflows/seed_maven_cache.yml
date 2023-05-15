@@ -131,6 +131,9 @@ jobs:
         run: |
           mvn -T 1C --batch-mode versions:set \
               -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false
+        env:
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
+          project: "${{ inputs.artifact_name }}"
 
       - name: show maven repo
         run: |
