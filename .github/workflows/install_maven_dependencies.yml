@@ -61,7 +61,7 @@ on:
 
 
 jobs:
-  seed_cache:
+  install_deps:
     runs-on: ubuntu-latest
     steps:
       - name: git-checkout-ref-action
@@ -95,16 +95,13 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ steps.version.outputs.version_last_numeric }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ steps.version.outputs.version_tag_numeric }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
 
       - name: show path
         run: |
-          echo ${{ steps.version.outputs.version_last_numeric }}
-          false
-          exit 1
           echo "$PATH"
           which java
           echo "$JAVA_HOME"
@@ -117,7 +114,6 @@ jobs:
         shell: bash
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-          version_last_numeric: "${{ steps.version.outputs.version_last_numeric }}"
           project: "${{ inputs.artifact_name }}"
 
       - name: populate orcid-persistence/src/main/resources/release_name.txt with numeric tag

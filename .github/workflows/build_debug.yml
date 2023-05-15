@@ -50,6 +50,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  seed_maven_cache:
+    uses: ./.github/workflows/seed_maven_cache.yml
+    with:
+      version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
   install_maven_dependencies:
     uses: ./.github/workflows/install_maven_dependencies.yml
