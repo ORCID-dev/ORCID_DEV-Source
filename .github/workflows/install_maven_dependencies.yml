@@ -61,7 +61,7 @@ on:
 
 
 jobs:
-  bld_maven:
+  seed_cache:
     runs-on: ubuntu-latest
     steps:
       - name: git-checkout-ref-action
@@ -102,6 +102,9 @@ jobs:
 
       - name: show path
         run: |
+          echo ${{ steps.version.outputs.version_last_numeric }}
+          false
+          exit 1
           echo "$PATH"
           which java
           echo "$JAVA_HOME"
@@ -115,6 +118,12 @@ jobs:
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
           project: "${{ inputs.artifact_name }}"
+
+      - name: populate orcid-persistence/src/main/resources/release_name.txt with numeric tag
+        run: |
+          echo "$version_tag_numeric" > orcid-persistence/src/main/resources/release_name.txt
+        env:
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
       - name: bump version of the parent pom and connected projects
         run: |
