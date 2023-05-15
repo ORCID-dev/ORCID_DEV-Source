@@ -59,6 +59,8 @@ jobs:
 
   install_maven_dependencies:
     uses: ./.github/workflows/install_maven_dependencies.yml
+    needs:
+      - seed_maven_cache
     with:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
