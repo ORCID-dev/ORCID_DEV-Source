@@ -140,7 +140,7 @@ jobs:
           echo "$tag_numeric"
           echo "$project"
           if [[ -d ~/.m2/repository/ ]];then
-            find ~/.m2/repository/ -name '*.jar' | grep orcid
+            find ~/.m2/repository/ -name '*' | grep orcid
           fi
 
         shell: bash
