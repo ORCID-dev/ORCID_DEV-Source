@@ -108,7 +108,9 @@ jobs:
           echo "$JAVA_HOME"
           echo "$tag_numeric"
           echo "$project"
-          find ~/.m2/repository/ -name '*.jar' | grep orcid
+          if [[ -d ~/.m2/repository/ ]];then
+            find ~/.m2/repository/ -name '*.jar' | grep orcid
+          fi
 
         shell: bash
         env:
@@ -201,7 +203,9 @@ jobs:
 
       - name: show jar files
         run: |
-          find ~/.m2/repository/ -name '*.jar' | grep orcid
+          if [[ -d ~/.m2/repository/ ]];then
+            find ~/.m2/repository/ -name '*.jar' | grep orcid
+          fi
 
       - name: deploy war file
         run: |

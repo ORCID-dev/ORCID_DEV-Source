@@ -107,7 +107,10 @@ jobs:
           echo "$JAVA_HOME"
           echo "$tag_numeric"
           echo "$project"
-          find ~/.m2/repository/ -name '*.jar' | grep orcid
+          if [[ -d ~/.m2/repository/ ]];then
+            find ~/.m2/repository/ -name '*.jar' | grep orcid
+          fi
+
         shell: bash
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
@@ -182,6 +185,6 @@ jobs:
           git config user.email "<>"
           git status
           git diff
-          find ~/.m2/repository/ -name '*.jar' | grep orcid
-
-
+          if [[ -d ~/.m2/repository/ ]];then
+            find ~/.m2/repository/ -name '*.jar' | grep orcid
+          fi
