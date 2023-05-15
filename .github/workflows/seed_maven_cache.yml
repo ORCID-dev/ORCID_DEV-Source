@@ -123,7 +123,19 @@ jobs:
       - name: show maven repo
         run: |
           if [[ -d ~/.m2/repository/ ]];then
-            find ~/.m2/repository/ -name '*.jar' | grep orcid
+            find ~/.m2/repository/
+          fi
+        shell: bash
+
+      - name: bump version of the parent pom and connected projects to download more dependencies
+        run: |
+          mvn -T 1C --batch-mode versions:set \
+              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false
+
+      - name: show maven repo
+        run: |
+          if [[ -d ~/.m2/repository/ ]];then
+            find ~/.m2/repository/
           fi
         shell: bash
 
