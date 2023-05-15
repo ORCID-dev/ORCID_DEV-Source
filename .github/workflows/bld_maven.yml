@@ -132,6 +132,22 @@ jobs:
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
 
+      - name: show maven repo
+        run: |
+          echo "$PATH"
+          which java
+          echo "$JAVA_HOME"
+          echo "$tag_numeric"
+          echo "$project"
+          if [[ -d ~/.m2/repository/ ]];then
+            find ~/.m2/repository/ -name '*.jar' | grep orcid
+          fi
+
+        shell: bash
+        env:
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
+          project: "${{ inputs.artifact_name }}"
+
       - name: bump the tagged version in the poms of projects not tied to the parent pom (orcid-test)
         run: |
           mvn -T 1C --batch-mode versions:set \
