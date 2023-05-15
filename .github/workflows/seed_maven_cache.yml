@@ -120,3 +120,11 @@ jobs:
         run: |
           mvn -T 1C --batch-mode dependency:resolve --fail-never
 
+      - name: show maven repo
+        run: |
+          if [[ -d ~/.m2/repository/ ]];then
+            find ~/.m2/repository/ -name '*.jar' | grep orcid
+          fi
+        shell: bash
+
+
