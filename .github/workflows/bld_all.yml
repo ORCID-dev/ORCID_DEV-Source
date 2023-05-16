@@ -24,6 +24,11 @@ on:
         required: false
         default: "default"
         type: string
+      seed_maven_cache:
+        description: Whether to seed cache
+        type: boolean
+        required: false
+        default: true
 
   workflow_dispatch:
     inputs:
@@ -48,6 +53,11 @@ on:
         required: false
         default: "default"
         type: string
+      seed_maven_cache:
+        description: Whether to seed cache
+        type: boolean
+        required: false
+        default: true
 
 jobs:
 
@@ -64,6 +74,8 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
+
 
   bld_amq:
     uses: ./.github/workflows/bld_maven.yml
@@ -78,6 +90,7 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   bld_api:
     uses: ./.github/workflows/bld_maven.yml
@@ -92,6 +105,7 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   bld_iapi:
     uses: ./.github/workflows/bld_maven.yml
@@ -106,6 +120,7 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   bld_pubweb:
     uses: ./.github/workflows/bld_maven.yml
@@ -120,6 +135,7 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   bld_sched:
     uses: ./.github/workflows/bld_maven.yml
@@ -134,6 +150,7 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   bld_web:
     uses: ./.github/workflows/bld_maven.yml
@@ -148,8 +165,5 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
-
-
-
-
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
