@@ -56,36 +56,44 @@ jobs:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-message-listener
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   tst_amq:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-activemq
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   tst_api:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-api-web
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   tst_iapi:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-internal-api
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   tst_pubweb:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-pub-web
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
+
 
   tst_sched:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-scheduler-web
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   tst_web:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-web
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
 ##########################################################
 
@@ -93,21 +101,25 @@ jobs:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-utils
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   tst_parent:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-parent
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   tst_core:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-core
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
   tst_test:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-test
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
 
 
 
