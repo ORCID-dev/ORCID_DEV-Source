@@ -1,5 +1,5 @@
 name: bld_maven
-run-name: bld-{{ inputs.artifact_name }}
+run-name: bld-{{ inputs.project }}
 
 permissions:
   checks: write
@@ -10,7 +10,7 @@ permissions:
 on:
   workflow_call:
     inputs:
-      artifact_name:
+      project:
         description: 'Name of the artifact env'
         required: false
         default: 'prod'
@@ -39,7 +39,7 @@ on:
 
   workflow_dispatch:
     inputs:
-      artifact_name:
+      project:
         description: 'Name of the artifact env'
         required: false
         default: 'prod'
@@ -135,20 +135,20 @@ jobs:
           find . -name '*.war'
           find . -name '*.jar'
         env:
-          project: "${{ inputs.artifact_name }}"
+          project: "${{ inputs.project }}"
 
 #
 # orcid-web customization
 #
 
       - name: setup node for angular static file
-        if: ${{ inputs.artifact_name == 'orcid-web' }}
+        if: ${{ inputs.project == 'orcid-web' }}
         uses: actions/setup-node@v3
         with:
           node-version: 18.7.0
 
       - name: build angular parts if we are building orcid-web
-        if: ${{ inputs.artifact_name == 'orcid-web' }}
+        if: ${{ inputs.project == 'orcid-web' }}
         run: |
           echo "Build angular_orcid_generated.js"
           cd orcid-nodejs
@@ -176,7 +176,7 @@ jobs:
 
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-          project: "${{ inputs.artifact_name }}"
+          project: "${{ inputs.project }}"
 
 ##################################################################################################################
 
@@ -195,5 +195,5 @@ jobs:
           ARTIFACT_REPO_PATH: "${{ secrets.ARTIFACT_REPO_PATH }}"
           ARTIFACT_USER: "${{ secrets.ARTIFACT_USER }}"
           ARTIFACT_PASSWORD: "${{ secrets.ARTIFACT_PASSWORD }}"
-          project: "${{ inputs.artifact_name }}"
+          project: "${{ inputs.project }}"
 

@@ -9,7 +9,7 @@ permissions:
 on:
   workflow_call:
     inputs:
-      artifact_name:
+      project:
         description: 'Name of the artifact env'
         required: false
         default: 'prod'
@@ -32,7 +32,7 @@ on:
 
   workflow_dispatch:
     inputs:
-      artifact_name:
+      project:
         description: 'Name of the artifact env'
         required: false
         default: 'prod'

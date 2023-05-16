@@ -59,11 +59,23 @@ jobs:
 
 ##############################################################################
 
+  unit_tests_publish:
+    uses: ./.github/workflows/maven_test_publish.yml
+    with:
+      version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
+      project: orcid-message-listener
+      seed_maven_cache: false
+    needs:
+      - seed_maven_cache
+
   bld_ml:
     uses: ./.github/workflows/bld_maven.yml
     secrets: inherit # pass all secrets for uploading assets
     needs:
       - seed_maven_cache
+      - unit_tests_publish
     permissions:
       checks: write
       contents: read
@@ -73,5 +85,5 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
-      artifact_name: orcid-message-listener
+      project: orcid-message-listener
       seed_maven_cache: false

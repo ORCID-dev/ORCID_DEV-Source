@@ -12,77 +12,120 @@ permissions:
 on:
   workflow_call:
     inputs:
-      context:
-        description: 'Name of the context in the repo'
+      project:
+        description: 'Name of the artifact env'
         required: false
-        default: "."
+        default: 'prod'
         type: string
+      version_tag:
+        description: 'Name of the tag to build'
+        required: false
+        default: 'latest'
+        type: string
+      bump:
+        description: 'whether to bump the version number by a major minor patch amount or none'
+        required: false
+        default: 'patch'
+        type: string
+      ref:
+        description: 'git reference to use with the checkout use default_branch to have that calculated'
+        required: false
+        default: "default"
+        type: string
+      seed_maven_cache:
+        description: Whether to seed cache
+        type: boolean
+        required: false
+        default: true
 
   workflow_dispatch:
     inputs:
-      context:
-        description: 'Name of the context in the repo'
+      project:
+        description: 'Name of the artifact env'
         required: false
-        default: "."
+        default: 'prod'
         type: string
+      version_tag:
+        description: 'Name of the tag to build'
+        required: false
+        default: 'latest'
+        type: string
+      bump:
+        description: 'whether to bump the version number by a major minor patch amount or none'
+        required: false
+        default: 'patch'
+        type: string
+      ref:
+        description: 'git reference to use with the checkout use default_branch to have that calculated'
+        required: false
+        default: "default"
+        type: string
+      seed_maven_cache:
+        description: Whether to seed cache
+        type: boolean
+        required: false
+        default: true
 
 jobs:
   maven_test:
     runs-on: ubuntu-latest
     steps:
+      - name: git-checkout-ref-action
+        id: ref
+        uses: ORCID/git-checkout-ref-action@main
+        with:
+          default_branch: ${{ github.event.repository.default_branch }}
+          ref: ${{ inputs.ref }}
+
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.ref.outputs.ref }}
+          # checkout some history so we can scan commits for bump messages
+          # NOTE: history does not include tags!
+          fetch-depth: 100
+
+      - name: find next version
+        id: version
+        uses: ORCID/version-bump-action@main
+        with:
+          version_tag: ${{ inputs.version_tag }}
+          bump: ${{ inputs.bump }}
 
       - name: Set up Open JDK 11
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11'
-          cache: 'maven'
 
-      - name: install orcid-test into our local maven repo because the builds depend a version release
-        run: |
-          mvn -T 1C --batch-mode install -DskipTests \
-                    -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-                    --projects orcid-test
+      - name: Cache local Maven repository keyed off the pom
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-      - name: install orcid-parent into our local maven repo because the builds depend a version release
-        run: |
-          mvn -T 1C --batch-mode --non-recursive clean install -DskipTests \
-              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+      - name: seed_maven_cache
+        if: ${{ inputs.seed_maven_cache }}
+        id: cache
+        uses: ORCID-dev/ORCID_DEV-source-cache-action@main
+        with:
+          version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
-      - name: install orcid-utils into our local maven repo because the builds depend a version release
-        run: |
-          mvn -T 1C --batch-mode clean install -DskipTests \
-              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-              --projects orcid-utils
+      - name: install_dependencies
+        id: install_dependencies
+        uses: ORCID-dev/ORCID_DEV-source-dependencies-action@main
+        with:
+          version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
-      - name: install orcid-persistence into our local maven repo because orcid-core depends on it
-        run: |
-          mvn -T 1C --batch-mode clean install -DskipTests \
-              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-              --projects orcid-persistence
-
-      - name: install orcid-core into our local maven repo because the builds depend a version release
-        run: |
-          mvn -T 1C --batch-mode clean install -DskipTests \
-              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-              --projects orcid-core
-
-      - name: install orcid-api-common into our local maven repo because the deploy depends on this orcid-web orcid-iapi orcid-api
-        if: ${{ inputs.context == 'orcid-web' }} || ${{ inputs.context == 'orcid-internal-api' }} || ${{ inputs.context == 'orcid-api-web' }} || ${{ inputs.context == 'orcid-pub-web' }}
-        run: |
-          mvn -T 1C --batch-mode clean install -DskipTests \
-              -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-              --projects orcid-api-common
-
-      - name: "Test ${{ inputs.context }}"
+      - name: "Test ${{ inputs.project }}"
         run: |
           mvn -T 1C --batch-mode -Dmaven.test.failure.ignore=true test \
               -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-              --projects ${{ inputs.context }}
+              --projects ${{ inputs.project }}
 
       - uses: actions/upload-artifact@v3  # upload test results
         if: success() || failure()        # run this step even if previous step failed
         with:
-          name: ${{ inputs.context }}
-          path: ${{ inputs.context }}/target/surefire-reports/*.xml
+          name: ${{ inputs.project }}
+          path: ${{ inputs.project }}/target/surefire-reports/*.xml

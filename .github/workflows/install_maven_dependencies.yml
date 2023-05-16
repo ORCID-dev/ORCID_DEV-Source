@@ -9,7 +9,7 @@ permissions:
 on:
   workflow_call:
     inputs:
-      artifact_name:
+      project:
         description: 'Name of the artifact env'
         required: false
         default: 'prod'
@@ -32,7 +32,7 @@ on:
 
   workflow_dispatch:
     inputs:
-      artifact_name:
+      project:
         description: 'Name of the artifact env'
         required: false
         default: 'prod'
@@ -114,7 +114,7 @@ jobs:
         shell: bash
         env:
           version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-          project: "${{ inputs.artifact_name }}"
+          project: "${{ inputs.project }}"
 
       - name: populate orcid-persistence/src/main/resources/release_name.txt with numeric tag
         run: |
