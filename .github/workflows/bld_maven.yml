@@ -91,9 +91,8 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
-          #cache: 'maven'
 
-      - name: Cache local Maven repository keyed off the last version
+      - name: Cache local Maven repository keyed off the pom
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
@@ -101,68 +100,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: show path
-        run: |
-          echo "$PATH"
-          which java
-          echo "$JAVA_HOME"
-          echo "$tag_numeric"
-          echo "$project"
-          if [[ -d ~/.m2/repository/ ]];then
-            find ~/.m2/repository/ -name '*.jar' | grep orcid
-          fi
-
-        shell: bash
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-          project: "${{ inputs.artifact_name }}"
-
-      - name: populate orcid-persistence/src/main/resources/release_name.txt with numeric tag
-        run: |
-          echo "$version_tag_numeric" > orcid-persistence/src/main/resources/release_name.txt
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-
-      - name: bump version of the parent pom and connected projects
-        run: |
-          mvn -T 1C --batch-mode versions:set \
-              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false
-
-          # -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-
-      - name: show maven repo
-        run: |
-          echo "$PATH"
-          which java
-          echo "$JAVA_HOME"
-          echo "$tag_numeric"
-          echo "$project"
-          if [[ -d ~/.m2/repository/ ]];then
-            find ~/.m2/repository/ -name '*' | grep orcid
-          fi
-
-        shell: bash
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-          project: "${{ inputs.artifact_name }}"
-
-      - name: bump the tagged version in the poms of projects not tied to the parent pom (orcid-test)
-        run: |
-          mvn -T 1C --batch-mode versions:set \
-              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-              --projects orcid-test
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-
-      - name: check some build related things
-        run: |
-          git --version
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git status
-          git diff
+      - name: install_dependencies
+        id: install_dependencies
+        uses: ORCID-dev/ORCID_DEV-source-dependencies-action@main
+        with:
+          version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
       - name: build our project
         run: |
@@ -218,12 +160,6 @@ jobs:
           project: "${{ inputs.artifact_name }}"
 
 ##################################################################################################################
-
-      - name: show jar files
-        run: |
-          if [[ -d ~/.m2/repository/ ]];then
-            find ~/.m2/repository/ -name '*.jar' | grep orcid
-          fi
 
       - name: deploy war file
         run: |

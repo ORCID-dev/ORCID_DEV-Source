@@ -57,22 +57,12 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
 
-#   install_maven_dependencies:
-#     uses: ./.github/workflows/install_maven_dependencies.yml
-#     needs:
-#       - seed_maven_cache
-#     with:
-#       version_tag: ${{ inputs.version_tag }}
-#       bump: ${{ inputs.bump }}
-#       ref: ${{ inputs.ref }}
-# 
 ##############################################################################
 
   bld_ml:
     uses: ./.github/workflows/bld_maven.yml
     secrets: inherit # pass all secrets for uploading assets
     needs:
-     # - install_maven_dependencies
       - seed_maven_cache
     permissions:
       checks: write
