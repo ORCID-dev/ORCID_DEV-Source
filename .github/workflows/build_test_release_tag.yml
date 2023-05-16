@@ -54,13 +54,22 @@ jobs:
   lint:
     uses: ./.github/workflows/lint.yml
 
-  install_maven_dependencies:
-    uses: ./.github/workflows/install_maven_dependencies.yml
+  seed_maven_cache:
+    uses: ./.github/workflows/seed_maven_cache.yml
+    with:
+      version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
 
   unit_tests_publish:
     uses: ./.github/workflows/unit_tests_publish.yml
+    with:
+      version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
+      seed_maven_cache: false
     needs:
-      - install_maven_dependencies
+      - seed_maven_cache
 
 ##############################################################################
   bld_all:
@@ -78,19 +87,20 @@ jobs:
       version_tag: ${{ inputs.version_tag }}
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
+      seed_maven_cache: false
 
 ##############################################################################
 
-  rel_tag:
-    uses: ./.github/workflows/rel_tag.yml
-    needs: bld_all
-    with:
-      version_tag: ${{ inputs.version_tag }}
-      bump: ${{ inputs.bump }}
-      ref: ${{ inputs.ref }}
-    secrets: inherit # pass all secrets
-    permissions:
-      checks: write
-      contents: write
-      issues: read
-      pull-requests: write
+#   rel_tag:
+#     uses: ./.github/workflows/rel_tag.yml
+#     needs: bld_all
+#     with:
+#       version_tag: ${{ inputs.version_tag }}
+#       bump: ${{ inputs.bump }}
+#       ref: ${{ inputs.ref }}
+#     secrets: inherit # pass all secrets
+#     permissions:
+#       checks: write
+#       contents: write
+#       issues: read
+#       pull-requests: write

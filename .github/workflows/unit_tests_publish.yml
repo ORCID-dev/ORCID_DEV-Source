@@ -6,18 +6,49 @@ on:
   workflow_call:
     inputs:
       version_tag:
-        description: 'version tag to use'
+        description: 'Name of the tag to build'
         required: false
-        default: "next_tag"
+        default: 'latest'
         type: string
+      bump:
+        description: 'whether to bump the version number by a major minor patch amount or none'
+        required: false
+        default: 'patch'
+        type: string
+      ref:
+        description: 'git reference to use with the checkout use default_branch to have that calculated'
+        required: false
+        default: "default"
+        type: string
+      seed_maven_cache:
+        description: Whether to seed cache
+        type: boolean
+        required: false
+        default: true
 
   workflow_dispatch:
     inputs:
       version_tag:
-        description: 'version tag to use'
+        description: 'Name of the tag to build'
         required: false
-        default: "next_tag"
+        default: 'latest'
         type: string
+      bump:
+        description: 'whether to bump the version number by a major minor patch amount or none'
+        required: false
+        default: 'patch'
+        type: string
+      ref:
+        description: 'git reference to use with the checkout use default_branch to have that calculated'
+        required: false
+        default: "default"
+        type: string
+      seed_maven_cache:
+        description: Whether to seed cache
+        type: boolean
+        required: false
+        default: true
+
 
 jobs:
 
