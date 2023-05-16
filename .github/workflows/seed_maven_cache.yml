@@ -99,41 +99,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-
-      - name: show path
-        run: |
-          echo "$PATH"
-          which java
-          echo "$JAVA_HOME"
-          echo "$tag_numeric"
-          echo "$project"
-          if [[ -d ~/.m2/repository/ ]];then
-            find ~/.m2/repository/ -name '*.jar' | grep orcid
-          fi
-
-        shell: bash
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-          project: "${{ inputs.artifact_name }}"
-
-      - name: download maven dependencies
-        run: |
-          mvn -T 1C --batch-mode dependency:resolve --fail-never
-
-      - name: show maven repo
-        run: |
-          if [[ -d ~/.m2/repository/ ]];then
-            find ~/.m2/repository/
-          fi
-        shell: bash
-
-      - name: bump version of the parent pom and connected projects to download more dependencies
-        run: |
-          mvn -T 1C --batch-mode versions:set \
-              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false
-        env:
-          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
-          project: "${{ inputs.artifact_name }}"
+      - name: seed_cache
+        id: cache
+        uses: ORCID-dev/ORCID_DEV-source-cache-action@main
+        with:
+          version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
       - name: show maven repo
         run: |
