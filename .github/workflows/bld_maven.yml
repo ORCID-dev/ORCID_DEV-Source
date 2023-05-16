@@ -30,6 +30,12 @@ on:
         required: false
         default: "default"
         type: string
+      seed_maven_cache:
+        description: Whether to seed cache
+        type: boolean
+        required: false
+        default: true
+
 
   workflow_dispatch:
     inputs:
@@ -59,7 +65,11 @@ on:
         required: false
         default: "default"
         type: string
-
+      seed_maven_cache:
+        description: Whether to seed cache
+        type: boolean
+        required: false
+        default: true
 
 jobs:
   bld_maven:
@@ -91,6 +101,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
+######################################################################################################################
 
       - name: Cache local Maven repository keyed off the pom
         uses: actions/cache@v3
@@ -99,6 +110,14 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+
+
+      - name: seed_maven_cache
+        if: ${{ inputs.seed_maven_cache }}
+        id: cache
+        uses: ORCID-dev/ORCID_DEV-source-cache-action@main
+        with:
+          version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
       - name: install_dependencies
         id: install_dependencies

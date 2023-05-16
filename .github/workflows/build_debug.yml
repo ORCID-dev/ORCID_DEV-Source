@@ -74,4 +74,4 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       artifact_name: orcid-message-listener
-
+      seed_maven_cache: false
