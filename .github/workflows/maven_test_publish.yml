@@ -112,6 +112,17 @@ jobs:
         with:
           version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
+      - name: show path
+        run: |
+          echo "$PATH"
+          which java
+          echo "$JAVA_HOME"
+          echo "$tag_numeric"
+          echo "$project"
+          if [[ -d ~/.m2/repository/ ]];then
+            find ~/.m2/repository/ -name '*.jar' | grep orcid
+          fi
+
 #       - name: install_dependencies
 #         id: install_dependencies
 #         uses: ORCID-dev/ORCID_DEV-source-dependencies-action@main
