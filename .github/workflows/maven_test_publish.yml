@@ -101,7 +101,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
@@ -112,12 +112,12 @@ jobs:
         with:
           version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
-      - name: install_dependencies
-        id: install_dependencies
-        uses: ORCID-dev/ORCID_DEV-source-dependencies-action@main
-        with:
-          version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
-
+#       - name: install_dependencies
+#         id: install_dependencies
+#         uses: ORCID-dev/ORCID_DEV-source-dependencies-action@main
+#         with:
+#           version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
+# 
       - name: "Test ${{ inputs.project }}"
         run: |
           mvn -T 1C --batch-mode -Dmaven.test.failure.ignore=true test \

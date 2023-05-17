@@ -57,6 +57,16 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
 
+  install_maven_dependencies:
+    uses: ./.github/workflows/install_maven_dependencies.yml
+    with:
+      version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
+    needs:
+      - seed_maven_cache
+
+
 ##############################################################################
 
   unit_tests_publish:
@@ -68,7 +78,7 @@ jobs:
       project: orcid-message-listener
       seed_maven_cache: false
     needs:
-      - seed_maven_cache
+      - install_maven_dependencies
 
   bld_ml:
     uses: ./.github/workflows/bld_maven.yml
