@@ -112,6 +112,13 @@ jobs:
         with:
           version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
+      - name: bump version of the parent pom and connected projects
+        run: |
+          mvn -T 1C --batch-mode versions:set -DskipTests \
+              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false
+        env:
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
+
       - name: show path
         run: |
           echo "$PATH"
