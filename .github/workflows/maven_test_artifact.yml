@@ -103,6 +103,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
+            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ steps.version.outputs.version_tag_numeric }}
             ${{ runner.os }}-maven-
 
       - name: seed_maven_cache
