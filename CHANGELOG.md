@@ -1,3 +1,8 @@
+## v2.19.25 - 2023-05-18
+[Full Changelog](https://github.com/ORCID-dev/ORCID_DEV-Source/compare/v2.19.24...v2.19.25)
+
+- [#3](https://github.com/ORCID-dev/ORCID_DEV-Source/pull/3): fix/gha-dummy-12
+
 ## v2.19.24 - 2023-05-18
 [Full Changelog](https://github.com/ORCID-dev/ORCID_DEV-Source/compare/v2.19.23...v2.19.24)
 
