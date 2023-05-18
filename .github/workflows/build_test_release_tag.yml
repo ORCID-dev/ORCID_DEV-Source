@@ -61,6 +61,15 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
 
+  install_maven_dependencies:
+    uses: ./.github/workflows/install_maven_dependencies.yml
+    with:
+      version_tag: ${{ inputs.version_tag }}
+      bump: ${{ inputs.bump }}
+      ref: ${{ inputs.ref }}
+    needs:
+      - seed_maven_cache
+
   unit_tests_publish:
     uses: ./.github/workflows/unit_tests_publish.yml
     with:
@@ -69,8 +78,9 @@ jobs:
       ref: ${{ inputs.ref }}
       seed_maven_cache: false
     needs:
+      - lint
       - seed_maven_cache
-
+      - install_maven_dependencies
 ##############################################################################
   bld_all:
     uses: ./.github/workflows/bld_all.yml
@@ -78,6 +88,7 @@ jobs:
     needs:
       - lint
       - unit_tests_publish
+      - install_maven_dependencies
     permissions:
       checks: write
       contents: read
@@ -88,6 +99,7 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       seed_maven_cache: false
+      install_maven_dependencies: false
 
 ##############################################################################
 

@@ -17,3 +17,5 @@ concurrency:
 jobs:
   lint:
     uses: ./.github/workflows/lint.yml
+  seed_maven_cache:
+    uses: ./.github/workflows/seed_maven_cache.yml

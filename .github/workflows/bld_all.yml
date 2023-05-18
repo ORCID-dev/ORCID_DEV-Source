@@ -29,6 +29,11 @@ on:
         type: boolean
         required: false
         default: true
+      install_maven_dependencies:
+        description: Whether to install dependencies or use a previous cache
+        type: boolean
+        required: false
+        default: true
 
   workflow_dispatch:
     inputs:
@@ -58,6 +63,11 @@ on:
         type: boolean
         required: false
         default: true
+      install_maven_dependencies:
+        description: Whether to install dependencies or use a previous cache
+        type: boolean
+        required: false
+        default: true
 
 jobs:
 
@@ -75,7 +85,7 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
-
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   bld_amq:
     uses: ./.github/workflows/bld_maven.yml
@@ -91,6 +101,7 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   bld_api:
     uses: ./.github/workflows/bld_maven.yml
@@ -106,6 +117,7 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   bld_iapi:
     uses: ./.github/workflows/bld_maven.yml
@@ -121,6 +133,7 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   bld_pubweb:
     uses: ./.github/workflows/bld_maven.yml
@@ -136,6 +149,7 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   bld_sched:
     uses: ./.github/workflows/bld_maven.yml
@@ -151,6 +165,7 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   bld_web:
     uses: ./.github/workflows/bld_maven.yml
@@ -166,4 +181,5 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
