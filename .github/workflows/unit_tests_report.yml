@@ -57,17 +57,22 @@ jobs:
 #########################################################################################
 
   tst_utils:
-    uses: ./.github/workflows/maven_test_publish.yml
+    uses: ./.github/workflows/maven_test_report.yml
     with:
       project: orcid-utils
 
   tst_core:
-    uses: ./.github/workflows/maven_test_publish.yml
+    uses: ./.github/workflows/maven_test_report.yml
     with:
       project: orcid-core
 
-  tst_test:
-    uses: ./.github/workflows/maven_test_publish.yml
+  tst_persistence:
+    uses: ./.github/workflows/maven_test_report.yml
     with:
-      project: orcid-test
+      project: orcid-persistence
+
+  tst_api_common:
+    uses: ./.github/workflows/maven_test_report.yml
+    with:
+      project: orcid-api-common
 
