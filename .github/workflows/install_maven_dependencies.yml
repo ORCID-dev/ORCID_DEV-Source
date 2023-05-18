@@ -1,5 +1,7 @@
 name: install_maven_dependencies
 
+# bump git sha
+
 permissions:
   checks: write
   contents: read
