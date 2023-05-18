@@ -116,7 +116,7 @@ jobs:
 # handle restoring a custom gha cache
 
       - name: if not installing dependencies restore special previous git_sha cache
-        if: ! ${{ inputs.install_maven_dependencies }}
+        if: ${{ ! inputs.install_maven_dependencies }}
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
@@ -125,7 +125,7 @@ jobs:
             ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
 
       - name: bump version of the parent pom and connected projects
-        if: ! ${{ inputs.install_maven_dependencies }}
+        if: ${{ ! inputs.install_maven_dependencies }}
         run: |
           mvn -T 1C --batch-mode versions:set -DskipTests \
               -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false
