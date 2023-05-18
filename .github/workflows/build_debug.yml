@@ -77,6 +77,7 @@ jobs:
       ref: ${{ inputs.ref }}
       project: orcid-message-listener
       seed_maven_cache: false
+      install_maven_dependencies: false
     needs:
       - install_maven_dependencies
 
@@ -97,3 +98,4 @@ jobs:
       ref: ${{ inputs.ref }}
       project: orcid-message-listener
       seed_maven_cache: false
+      install_maven_dependencies: false

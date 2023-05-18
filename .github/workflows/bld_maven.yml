@@ -35,6 +35,11 @@ on:
         type: boolean
         required: false
         default: true
+      install_maven_dependencies:
+        description: Whether to install dependencies or use a previous cache
+        type: boolean
+        required: false
+        default: true
 
 
   workflow_dispatch:
@@ -70,6 +75,12 @@ on:
         type: boolean
         required: false
         default: true
+      install_maven_dependencies:
+        description: Whether to install dependencies or use a previous cache
+        type: boolean
+        required: false
+        default: true
+
 
 jobs:
   bld_maven:
@@ -102,15 +113,35 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 ######################################################################################################################
+# handle restoring a custom gha cache
 
-      - name: Cache local Maven repository keyed off the pom
+      - name: if not installing dependencies restore special previous git_sha cache
+        if: ! ${{ inputs.install_maven_dependencies }}
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
+
+      - name: bump version of the parent pom and connected projects
+        if: ! ${{ inputs.install_maven_dependencies }}
+        run: |
+          mvn -T 1C --batch-mode versions:set -DskipTests \
+              -DnewVersion="$version_tag_numeric" -DgenerateBackupPoms=false
+        env:
+          version_tag_numeric: "${{ steps.version.outputs.version_tag_numeric }}"
+
+########################################################################################
+
+      - name: if installing dependencies use a standard cache key name
+        if: ${{ inputs.install_maven_dependencies }}
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-maven-
-
+            ${{ runner.os }}-maven
 
       - name: seed_maven_cache
         if: ${{ inputs.seed_maven_cache }}
@@ -119,7 +150,8 @@ jobs:
         with:
           version_tag_numeric: ${{ steps.version.outputs.version_tag_numeric }}
 
-      - name: install_dependencies
+      - name: install_dependencies and bump version
+        if: ${{ inputs.install_maven_dependencies }}
         id: install_dependencies
         uses: ORCID-dev/ORCID_DEV-source-dependencies-action@main
         with:
