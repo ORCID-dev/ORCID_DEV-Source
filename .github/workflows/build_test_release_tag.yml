@@ -77,6 +77,7 @@ jobs:
       bump: ${{ inputs.bump }}
       ref: ${{ inputs.ref }}
       seed_maven_cache: false
+      install_maven_dependencies: false
     needs:
       - lint
       - seed_maven_cache

@@ -27,6 +27,12 @@ on:
         type: boolean
         required: false
         default: true
+      install_maven_dependencies:
+        description: Whether to install dependencies or use a previous cache
+        type: boolean
+        required: false
+        default: true
+
 
   workflow_dispatch:
     inputs:
@@ -50,6 +56,11 @@ on:
         type: boolean
         required: false
         default: true
+      install_maven_dependencies:
+        description: Whether to install dependencies or use a previous cache
+        type: boolean
+        required: false
+        default: true
 
 jobs:
   tst_ml:
@@ -57,44 +68,49 @@ jobs:
     with:
       project: orcid-message-listener
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   tst_amq:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-activemq
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   tst_api:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-api-web
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   tst_iapi:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-internal-api
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   tst_pubweb:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-pub-web
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
-
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   tst_sched:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-scheduler-web
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   tst_web:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-web
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
-
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 ##########################################################
 
   tst_utils:
@@ -102,25 +118,26 @@ jobs:
     with:
       project: orcid-utils
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   tst_parent:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-parent
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   tst_core:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-core
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
   tst_test:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-test
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
-
-
-
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 

@@ -54,3 +54,25 @@ jobs:
     with:
       project: orcid-web
 
+#########################################################################################
+
+  tst_utils:
+    uses: ./.github/workflows/maven_test_publish.yml
+    with:
+      project: orcid-utils
+
+  tst_parent:
+    uses: ./.github/workflows/maven_test_publish.yml
+    with:
+      project: orcid-parent
+
+  tst_core:
+    uses: ./.github/workflows/maven_test_publish.yml
+    with:
+      project: orcid-core
+
+  tst_test:
+    uses: ./.github/workflows/maven_test_publish.yml
+    with:
+      project: orcid-test
+
