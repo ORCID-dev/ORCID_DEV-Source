@@ -61,11 +61,6 @@ jobs:
     with:
       project: orcid-utils
 
-  tst_parent:
-    uses: ./.github/workflows/maven_test_publish.yml
-    with:
-      project: orcid-parent
-
   tst_core:
     uses: ./.github/workflows/maven_test_publish.yml
     with:

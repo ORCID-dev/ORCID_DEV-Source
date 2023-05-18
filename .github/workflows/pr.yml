@@ -19,6 +19,9 @@ concurrency:
 jobs:
   unit_tests_artifact:
     uses: ./.github/workflows/unit_tests_artifact.yml
+    with:
+      seed_maven_cache: true
+      install_maven_dependencies: true
 
 #   NOTE: codeql is only available on public repos or enterprise github accounts
 #   codeql:

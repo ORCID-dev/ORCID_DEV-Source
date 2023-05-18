@@ -121,13 +121,6 @@ jobs:
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
       install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
-  tst_parent:
-    uses: ./.github/workflows/maven_test_publish.yml
-    with:
-      project: orcid-parent
-      seed_maven_cache: ${{ inputs.seed_maven_cache }}
-      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
-
   tst_core:
     uses: ./.github/workflows/maven_test_publish.yml
     with:
@@ -135,15 +128,19 @@ jobs:
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
       install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
-  tst_test:
+  tst_persistence:
     uses: ./.github/workflows/maven_test_publish.yml
     with:
-      project: orcid-test
+      project: orcid-persistence
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
       install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
-
-
+  tst_api_common:
+    uses: ./.github/workflows/maven_test_publish.yml
+    with:
+      project: orcid-api-common
+      seed_maven_cache: ${{ inputs.seed_maven_cache }}
+      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
 #   codeql:
 #     uses: ./.github/workflows/codeql.yml

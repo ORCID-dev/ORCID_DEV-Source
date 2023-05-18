@@ -120,24 +120,10 @@ jobs:
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
       install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
-  tst_parent:
-    uses: ./.github/workflows/maven_test_artifact.yml
-    with:
-      project: orcid-parent
-      seed_maven_cache: ${{ inputs.seed_maven_cache }}
-      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
-
   tst_core:
     uses: ./.github/workflows/maven_test_artifact.yml
     with:
       project: orcid-core
-      seed_maven_cache: ${{ inputs.seed_maven_cache }}
-      install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
-
-  tst_test:
-    uses: ./.github/workflows/maven_test_artifact.yml
-    with:
-      project: orcid-test
       seed_maven_cache: ${{ inputs.seed_maven_cache }}
       install_maven_dependencies: ${{ inputs.install_maven_dependencies }}
 
