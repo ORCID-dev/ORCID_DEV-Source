@@ -1,3 +1,7 @@
+## v2.19.26 - 2023-05-22
+[Full Changelog](https://github.com/ORCID-dev/ORCID_DEV-Source/compare/v2.19.25...v2.19.26)
+
+
 ## v2.19.25 - 2023-05-18
 [Full Changelog](https://github.com/ORCID-dev/ORCID_DEV-Source/compare/v2.19.24...v2.19.25)
 
