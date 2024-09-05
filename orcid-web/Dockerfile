@@ -4,8 +4,9 @@
 FROM maven:3.6.3-jdk-11 AS maven
 
 WORKDIR /build
+
 # copy all the git repo to build dir
-COPY ../* .
+COPY . .
 
 #mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false
 

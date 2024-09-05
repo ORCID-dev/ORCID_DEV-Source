@@ -4,7 +4,8 @@ services:
     image: ${DOCKER_REG_PRIVATE}/orcid/orcid-web:${TAG:-1}
     entrypoint: sleep infinity
     build:
-      context: orcid-web/
+      dockerfile: orcid-web/Dockerfile
+      context: .
       args:
         tag: ${TAG:-1}
 
