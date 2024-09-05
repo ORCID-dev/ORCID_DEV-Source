@@ -1,0 +1,10 @@
+version: '2'
+services:
+  web:
+    image: ${DOCKER_REG_PRIVATE}/orcid/orcid-web:${TAG:-1}
+    entrypoint: sleep infinity
+    build:
+      context: orcid-web/
+      args:
+        tag: ${TAG:-1}
+
