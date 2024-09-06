@@ -1,2 +1,11 @@
-**/target/**
-.git
+# Ignore everything
+*
+
+# Except directories
+!*/
+
+# Except pom.xml files
+!pom.xml
+
+# Except src/ subdirectories
+!**/src/*

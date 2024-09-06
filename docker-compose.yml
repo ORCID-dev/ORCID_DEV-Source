@@ -1,20 +1,37 @@
 version: '2'
 services:
   dependencies:
-    image: orcid/registry-dependencies:${TAG:-1}
+    image: orcid/registry-dependencies:${TAG:-0.0.1}
     entrypoint: sleep infinity
     build:
       context: .
       args:
-        tag_numeric: ${TAG:-1}
+        tag_numeric: ${TAG:-0.0.1}
+    # stop dependencies from being started with a compose up
+    profiles:
+      - build
 
   web:
-    image: ${DOCKER_REG_PRIVATE}/orcid/orcid-web:${TAG:-1}
+    image: ${DOCKER_REG_PRIVATE}/orcid/orcid-web:${TAG:-0.0.1}
     entrypoint: sleep infinity
     build:
       cache_from:
-        - orcid/registry-dependencies:${TAG:-1}
-      context: orcid-web/
+        - orcid/registry-dependencies:${TAG:-0.0.1}
+      context: .
+      dockerfile: orcid-web/Dockerfile
       args:
-        tag_numeric: ${TAG:-1}
+        tag_numeric: ${TAG:-0.0.1}
+
+  test_arg:
+    image: ${DOCKER_REG_PRIVATE}/orcid/orcid-arg:${TAG:-0.0.1}
+    entrypoint: sleep infinity
+    build:
+      cache_from:
+        - orcid/registry-dependencies:${TAG:-0.0.1}
+      context: .
+      dockerfile: test-arg-dockerfile
+      args:
+        wibble: ${TAG:-0.0.1}
+
+
 

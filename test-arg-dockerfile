@@ -1,0 +1,7 @@
+# match version from .tool-versions
+FROM maven:3.6.3-jdk-11 AS maven
+
+ARG wibble
+
+RUN echo $wibble > /root/blar.txt
+
