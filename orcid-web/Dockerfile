@@ -8,28 +8,16 @@ WORKDIR /build
 # copy all the git repo to build dir
 COPY . .
 
-#mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false
-
-# download and cache maven deps
-#RUN mvn dependency:go-offline
-
-# Compile and package the application to an executable JAR
-#RUN mvn package -Dmaven.test.skip=true
+RUN mvn versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-web -am package -DskipTests
 
 ###########################################################
 
 # For Java 11
 
-#FROM eclipse-temurin:11.0.14.1_1-jdk-alpine
-#FROM eclipse-temurin:11.0.14.1_1-jdk
-#FROM eclipse-temurin:11.0.12_7-jdk-focal
-#FROM eclipse-temurin:11-jre-focal
-#FROM eclipse-temurin:11-jdk-focal
-
-#WORKDIR /opt/app
+FROM tomcat:jre11-temurin-jammy
 
 # copy jar file from build
-#COPY --from=maven /build/target/*.jar /opt/app/gateway.jar
+COPY --from=maven /build/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
 #ADD newrelic/newrelic.yml /opt/app/newrelic.yml
 #RUN curl -L -s https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.6.0/newrelic-agent-7.6.0.jar -o /opt/app/newrelic.jar

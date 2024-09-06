@@ -1,11 +1,20 @@
 version: '2'
 services:
+  dependencies:
+    image: orcid/registry-dependencies:${TAG:-1}
+    entrypoint: sleep infinity
+    build:
+      context: .
+      args:
+        tag_numeric: ${TAG:-1}
+
   web:
     image: ${DOCKER_REG_PRIVATE}/orcid/orcid-web:${TAG:-1}
     entrypoint: sleep infinity
     build:
-      dockerfile: orcid-web/Dockerfile
-      context: .
+      cache_from:
+        - orcid/registry-dependencies:${TAG:-1}
+      context: orcid-web/
       args:
-        tag: ${TAG:-1}
+        tag_numeric: ${TAG:-1}
 
