@@ -30,15 +30,15 @@ RUN mvn -T 1C --batch-mode dependency:resolve --fail-never -Dorg.slf4j.simpleLog
 
 # copy everything not ignored in the .dockerignore file (src directories)
 COPY . .
-
-# bump the tagged version in the poms tied to the parent pom
-RUN mvn -T 1C --batch-mode versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false \
--Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-
-# bump the tagged version in the poms of projects not tied to the parent pom
-RUN mvn -T 1C --batch-mode versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-test \
--Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-
+# 
+# # bump the tagged version in the poms tied to the parent pom
+# RUN mvn -T 1C --batch-mode versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false \
+# -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+# 
+# # bump the tagged version in the poms of projects not tied to the parent pom
+# RUN mvn -T 1C --batch-mode versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-test \
+# -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+# 
 # install orcid-parent into our local maven repo because the builds depend a version tagged release
 RUN mvn -T 1C --batch-mode --non-recursive clean install -DskipTests \
 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
@@ -64,8 +64,8 @@ RUN mvn -T 1C --batch-mode --projects orcid-api-common clean install -DskipTests
 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 ############################################################################
-
-RUN mvn -T 1C --batch-mode -DnewVersion=$tag_numeric -DgenerateBackupPoms=false \
+# -DnewVersion=$tag_numeric
+RUN mvn -T 1C --batch-mode -DgenerateBackupPoms=false \
 --projects orcid-web -am package -DskipTests \
 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
