@@ -50,12 +50,14 @@ COPY orcid-persistence/src orcid-persistence/src
 RUN mvn -T 1C --batch-mode --projects orcid-persistence clean install -DskipTests \
 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
-# # install orcid-core into our local maven repo because the builds depend a version tagged release
-# RUN mvn -T 1C --batch-mode --projects orcid-core clean install -DskipTests \
-# -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-# 
-# # install orcid-api-common into our local maven repo because orcid-web deploy depends a version tagged release
-# RUN mvn -T 1C --batch-mode --projects orcid-api-common clean install -DskipTests \
-# -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-# 
-# 
+# install orcid-core into our local maven repo because the builds depend a version tagged release
+COPY orcid-core/src orcid-core/src
+RUN mvn -T 1C --batch-mode --projects orcid-core clean install -DskipTests \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+# install orcid-api-common into our local maven repo because orcid-web deploy depends a version tagged release
+COPY orcid-api-common/src orcid-api-common/src
+RUN mvn -T 1C --batch-mode --projects orcid-api-common clean install -DskipTests \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+
