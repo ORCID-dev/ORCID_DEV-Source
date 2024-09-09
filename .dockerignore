@@ -1,11 +1,10 @@
 # Ignore everything
 *
-
-# Except directories
-!*/
+**
 
 # Except pom.xml files
 !pom.xml
+!**/pom.xml
 
 # Except src/ subdirectories
 !**/src/*
