@@ -13,7 +13,7 @@ services:
 
   web:
     image: ${DOCKER_REG_PRIVATE}/orcid/orcid-web:${TAG:-0.0.1}
-    entrypoint: sleep infinity
+    # entrypoint: sleep infinity
     build:
       cache_from:
         - orcid/registry-dependencies:${TAG:-0.0.1}
@@ -22,16 +22,8 @@ services:
       args:
         tag_numeric: ${TAG:-0.0.1}
 
-  test_arg:
-    image: ${DOCKER_REG_PRIVATE}/orcid/orcid-arg:${TAG:-0.0.1}
-    entrypoint: sleep infinity
-    build:
-      cache_from:
-        - orcid/registry-dependencies:${TAG:-0.0.1}
-      context: .
-      dockerfile: test-arg-dockerfile
-      args:
-        wibble: ${TAG:-0.0.1}
+    ports:
+      - 0.0.0.0:8080:8080
 
 
 

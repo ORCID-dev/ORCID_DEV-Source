@@ -7,6 +7,7 @@ ARG tag_numeric
 
 WORKDIR /build
 
+# copy only poms for max cachability of just dependency downloads
 COPY pom.xml .
 COPY orcid-scheduler-web/pom.xml orcid-scheduler-web/pom.xml
 COPY orcid-api-web/pom.xml orcid-api-web/pom.xml
@@ -25,16 +26,55 @@ COPY orcid-api-common/pom.xml orcid-api-common/pom.xml
 COPY orcid-nodejs/pom.xml orcid-nodejs/pom.xml
 
 # download maven dependencies and ignore that some components will fail
-RUN mvn -T 1C --batch-mode dependency:resolve --fail-never
+RUN mvn -T 1C --batch-mode dependency:resolve --fail-never -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
-###########################################################
+# copy everything not ignored in the .dockerignore file (src directories)
+COPY . .
+
+# bump the tagged version in the poms tied to the parent pom
+RUN mvn -T 1C --batch-mode versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+# bump the tagged version in the poms of projects not tied to the parent pom
+RUN mvn -T 1C --batch-mode versions:set -DnewVersion=$tag_numeric -DgenerateBackupPoms=false --projects orcid-test \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+# install orcid-parent into our local maven repo because the builds depend a version tagged release
+RUN mvn -T 1C --batch-mode --non-recursive clean install -DskipTests \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+# install orcid-test into our local maven repo because the builds depend a version tagged release
+RUN mvn -T 1C --batch-mode --projects orcid-test clean install -DskipTests \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+# install orcid-utils into our local maven repo because the builds depend a version tagged release
+RUN mvn -T 1C --batch-mode --projects orcid-utils clean install -DskipTests \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+# install orcid-persistence into our local maven repo because orcid-core depends on it
+RUN mvn -T 1C --batch-mode --projects orcid-persistence clean install -DskipTests \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+# install orcid-core into our local maven repo because the builds depend a version tagged release
+RUN mvn -T 1C --batch-mode --projects orcid-core clean install -DskipTests \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+# install orcid-api-common into our local maven repo because orcid-web deploy depends a version tagged release
+RUN mvn -T 1C --batch-mode --projects orcid-api-common clean install -DskipTests \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+############################################################################
+
+RUN mvn -T 1C --batch-mode -DnewVersion=$tag_numeric -DgenerateBackupPoms=false \
+--projects orcid-web -am package -DskipTests \
+-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
 # For Java 11
 
 FROM tomcat:jre11-temurin-jammy
 
 # copy jar file from build
-COPY --from=maven /build/target/*.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=maven /build/*/target/*.war /usr/local/tomcat/webapps/ROOT.war
 
 #ADD newrelic/newrelic.yml /opt/app/newrelic.yml
 #RUN curl -L -s https://download.newrelic.com/newrelic/java-agent/newrelic-agent/7.6.0/newrelic-agent-7.6.0.jar -o /opt/app/newrelic.jar
