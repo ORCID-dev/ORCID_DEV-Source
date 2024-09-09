@@ -69,9 +69,8 @@ RUN mvn -T 1C --batch-mode -DnewVersion=$tag_numeric -DgenerateBackupPoms=false 
 --projects orcid-web -am package -DskipTests \
 -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
 
-# For Java 11
-
-FROM tomcat:jre11-temurin-jammy
+# For Java 11 and Tomcat 9
+FROM tomcat:9.0.93-jdk11-temurin-jammy
 
 # copy jar file from build
 COPY --from=maven /build/*/target/*.war /usr/local/tomcat/webapps/ROOT.war
