@@ -7,5 +7,7 @@
 !**/pom.xml
 
 !newrelic.yml
+!entrypoint.sh
+
 # Except src/ subdirectories
 !**/src/*

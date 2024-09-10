@@ -76,6 +76,11 @@ RUN mkdir -p /usr/local/tomcat/newrelic
 COPY newrelic.yml /usr/local/tomcat/newrelic/newrelic.yml
 RUN curl -L -s https://download.newrelic.com/newrelic/java-agent/newrelic-agent/8.13.0/newrelic-agent-8.13.0.jar -o /usr/local/tomcat/newrelic/newrelic.jar
 
+RUN apt-get update
+RUN apt-get install -y j2cli
+
+COPY entrypoint.sh .
+RUN chmod +x ./entrypoint.sh
 # add orcid ca to allow Java application to trust other containers
 #ADD cacerts /opt/java/openjdk/lib/security/cacerts
 
@@ -87,5 +92,5 @@ RUN curl -L -s https://download.newrelic.com/newrelic/java-agent/newrelic-agent/
 
 #RUN chmod +x ./entrypoint.sh
 
-#ENTRYPOINT ./entrypoint.sh
+ENTRYPOINT ./entrypoint.sh
 
