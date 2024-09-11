@@ -8,6 +8,7 @@
 
 !newrelic.yml
 !entrypoint.sh
+!**.j2
 
 # Except src/ subdirectories
 !**/src/*

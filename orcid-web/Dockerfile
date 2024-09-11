@@ -70,7 +70,7 @@ RUN mvn -T 1C --batch-mode -DgenerateBackupPoms=false \
 FROM tomcat:9.0.93-jdk11-temurin-jammy
 
 # copy jar file from build
-COPY --from=maven /build/*/target/*.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=maven /build/*/target/*.war /usr/local/tomcat/webapps/orcid-web.war
 
 RUN mkdir -p /usr/local/tomcat/newrelic
 COPY newrelic.yml /usr/local/tomcat/newrelic/newrelic.yml
@@ -81,11 +81,8 @@ RUN apt-get install -y j2cli
 
 COPY entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
-# add orcid ca to allow Java application to trust other containers
-#ADD cacerts /opt/java/openjdk/lib/security/cacerts
 
-# add orcid ca to system to allow curl healthchecks to work
-#ADD ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY orcid-web/*.j2 .
 
 # Build a shell script because the ENTRYPOINT command doesn't like using ENV
 #RUN echo "#!/usr/bin/env bash \n java \$JAVA_OPTS -javaagent:/opt/app/newrelic.jar -jar gateway.jar" > ./entrypoint.sh
