@@ -79,15 +79,13 @@ RUN curl -L -s https://download.newrelic.com/newrelic/java-agent/newrelic-agent/
 RUN apt-get update
 RUN apt-get install -y j2cli
 
+
 COPY entrypoint.sh .
 RUN chmod +x ./entrypoint.sh
 
 COPY orcid-web/*.j2 .
 
-# Build a shell script because the ENTRYPOINT command doesn't like using ENV
-#RUN echo "#!/usr/bin/env bash \n java \$JAVA_OPTS -javaagent:/opt/app/newrelic.jar -jar gateway.jar" > ./entrypoint.sh
-
-#RUN chmod +x ./entrypoint.sh
+COPY orcid-web/log4j2.xml .
 
 ENTRYPOINT ./entrypoint.sh
 
