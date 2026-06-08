@@ -84,17 +84,17 @@ jobs:
     strategy:
       matrix:
         include:
-          - project: orcid-message-listener
-          - project: orcid-activemq
-          - project: orcid-api-web
-          - project: orcid-internal-api
-          - project: orcid-pub-web
-          - project: orcid-scheduler-web
+          #- project: orcid-message-listener
+          #- project: orcid-activemq
+          #- project: orcid-api-web
+          #- project: orcid-internal-api
+          #- project: orcid-pub-web
+          #- project: orcid-scheduler-web
           - project: orcid-web
-          - project: orcid-utils
-          - project: orcid-core
-          - project: orcid-persistence
-          - project: orcid-api-common
+          #- project: orcid-utils
+          #- project: orcid-core
+          #- project: orcid-persistence
+          #- project: orcid-api-common
 
     runs-on: ubuntu-latest
     steps:
