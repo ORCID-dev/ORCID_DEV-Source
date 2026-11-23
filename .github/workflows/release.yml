@@ -63,7 +63,8 @@ jobs:
       version: ${{ needs.version.outputs.version }}
       run: |
         mvn -T 1C org.codehaus.mojo:versions-maven-plugin:2.25.2:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false
-        mvn -T 1C package -DskipTests --projects "$MODULE" --also-make
+        # install, not package: the deploy below runs on the module pom alone and takes its siblings from ~/.m2.
+        mvn -T 1C install -DskipTests --projects "$MODULE" --also-make
         if [ "$MODULE" = orcid-web ]; then
           ng1="$GITHUB_WORKSPACE/orcid-web/src/main/webapp/static/javascript/ng1Orcid"
           (cd orcid-nodejs && mvn -T 1C -P ci clean compile -Dnodejs.workingDirectory="$ng1")
