@@ -3,7 +3,7 @@ name: release
 on:
   push:
     branches: [main]
-    paths-ignore: [CHANGELOG.md, '.github/**']
+    paths-ignore: ['**.md', '.github/**']
   workflow_dispatch:
     inputs:
       version:
@@ -37,24 +37,24 @@ jobs:
       version: ${{ inputs.version }}
       bump: ${{ inputs.bump || 'patch' }}
 
-  maven_cache:
+  cache:
     needs: version
     permissions:
       contents: read
     uses: ORCID-dev/public-reusable-workflows/.github/workflows/build.yml@v1
     with:
-      name: maven_cache
+      name: cache
       java-version: '21'
       cache: save
       run: mvn -T 1C install -DskipTests
 
-  bld_mvn:
+  deploy:
     needs: version
     permissions:
       contents: read
     uses: ORCID-dev/public-reusable-workflows/.github/workflows/build.yml@v1
     with:
-      name: bld_mvn
+      name: deploy
       modules: >-
         ["orcid-message-listener", "orcid-activemq", "orcid-api-web", "orcid-internal-api", "orcid-pub-web",
         "orcid-scheduler-web", "orcid-web", "orcid-utils", "orcid-core", "orcid-persistence", "orcid-api-common"]
@@ -82,13 +82,13 @@ jobs:
         ARTIFACT_USER=${{ secrets.ARTIFACT_USER }}
         ARTIFACT_PASSWORD=${{ secrets.ARTIFACT_PASSWORD }}
 
-  bld_docker:
+  images:
     needs: version
     permissions:
       contents: read
     uses: ORCID-dev/public-reusable-workflows/.github/workflows/docker.yml@v1
     with:
-      name: bld_docker
+      name: images
       images: >-
         [{"name": "orcid/registry/orcid-web", "file": "orcid-web/Dockerfile"},
         {"name": "orcid/registry/orcid-web-proxy", "file": "orcid-web-proxy/Dockerfile"},
@@ -101,7 +101,7 @@ jobs:
       password: ${{ secrets.DOCKER_PASSWORD }}
 
   release:
-    needs: [version, bld_mvn, bld_docker]
+    needs: [version, deploy, images]
     if: github.event_name == 'push' || inputs.release
     permissions:
       contents: write

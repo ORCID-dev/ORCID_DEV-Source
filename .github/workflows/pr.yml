@@ -16,12 +16,12 @@ jobs:
       contents: read
     uses: ORCID-dev/public-reusable-workflows/.github/workflows/lint.yml@v1
 
-  test_mvn:
+  test:
     permissions:
       contents: read
     uses: ORCID-dev/public-reusable-workflows/.github/workflows/build.yml@v1
     with:
-      name: test_mvn
+      name: test
       modules: >-
         ["orcid-message-listener", "orcid-activemq", "orcid-api-web", "orcid-internal-api", "orcid-pub-web",
         "orcid-scheduler-web", "orcid-web", "orcid-utils", "orcid-core", "orcid-persistence", "orcid-api-common"]
@@ -29,3 +29,11 @@ jobs:
       run: |
         mvn -T 1C install -DskipTests --projects "$MODULE" --also-make
         mvn -T 1C test --projects "$MODULE" --fail-at-end
+
+  ok:
+    if: always()
+    needs: [lint, test]
+    permissions: {}
+    uses: ORCID-dev/public-reusable-workflows/.github/workflows/gate.yml@v1
+    with:
+      needs: ${{ toJSON(needs) }}
