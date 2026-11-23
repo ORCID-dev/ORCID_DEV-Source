@@ -1,32 +1,31 @@
 name: pr
 
-# read-only repo token
-# no access to secrets
-
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+  merge_group:
 
-  workflow_call:
+permissions: {}
 
-  workflow_dispatch:
-
-# cancel running job if another commit comes in
 concurrency:
-  group: pr-${{ github.ref }}-1
+  group: pr-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   lint:
-    uses: ./.github/workflows/lint.yml
+    permissions:
+      contents: read
+    uses: ORCID-dev/public-reusable-workflows/.github/workflows/lint.yml@v1
 
   test_mvn:
-    uses: ./.github/workflows/test_mvn.yml
+    permissions:
+      contents: read
+    uses: ORCID-dev/public-reusable-workflows/.github/workflows/build.yml@v1
     with:
-      seed_maven_cache: true
-      install_maven_dependencies: true
-
-#   NOTE: codeql is only available on public repos or enterprise github accounts
-#   codeql:
-#     uses: ./.github/workflows/codeql.yml
-#
+      name: test_mvn
+      modules: >-
+        ["orcid-message-listener", "orcid-activemq", "orcid-api-web", "orcid-internal-api", "orcid-pub-web",
+        "orcid-scheduler-web", "orcid-web", "orcid-utils", "orcid-core", "orcid-persistence", "orcid-api-common"]
+      java-version: '21'
+      run: |
+        mvn -T 1C install -DskipTests --projects "$MODULE" --also-make
+        mvn -T 1C test --projects "$MODULE" --fail-at-end
