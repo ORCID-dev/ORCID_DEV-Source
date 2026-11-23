@@ -1,0 +1,113 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: [CHANGELOG.md, '.github/**']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Explicit version, e.g. 3.25.11-p1. Empty bumps the latest tag.
+        type: string
+        default: ''
+      bump:
+        description: Used when version is empty.
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      release:
+        description: Tag the commit and create a GitHub Release.
+        type: boolean
+        default: true
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    # Mirrors set RELEASE_ON_PUSH=false and release by dispatch only.
+    if: github.event_name == 'workflow_dispatch' || vars.RELEASE_ON_PUSH == 'true'
+    permissions:
+      contents: read
+    uses: ORCID-dev/public-reusable-workflows/.github/workflows/version.yml@v1
+    with:
+      version: ${{ inputs.version }}
+      bump: ${{ inputs.bump || 'patch' }}
+
+  maven_cache:
+    needs: version
+    permissions:
+      contents: read
+    uses: ORCID-dev/public-reusable-workflows/.github/workflows/build.yml@v1
+    with:
+      name: maven_cache
+      java-version: '21'
+      cache: save
+      run: mvn -T 1C install -DskipTests
+
+  bld_mvn:
+    needs: version
+    permissions:
+      contents: read
+    uses: ORCID-dev/public-reusable-workflows/.github/workflows/build.yml@v1
+    with:
+      name: bld_mvn
+      modules: >-
+        ["orcid-message-listener", "orcid-activemq", "orcid-api-web", "orcid-internal-api", "orcid-pub-web",
+        "orcid-scheduler-web", "orcid-web", "orcid-utils", "orcid-core", "orcid-persistence", "orcid-api-common"]
+      java-version: '21'
+      node-version: 18.7.0
+      version: ${{ needs.version.outputs.version }}
+      run: |
+        mvn -T 1C org.codehaus.mojo:versions-maven-plugin:2.25.2:set -DnewVersion="$VERSION" -DgenerateBackupPoms=false
+        mvn -T 1C package -DskipTests --projects "$MODULE" --also-make
+        if [ "$MODULE" = orcid-web ]; then
+          ng1="$GITHUB_WORKSPACE/orcid-web/src/main/webapp/static/javascript/ng1Orcid"
+          (cd orcid-nodejs && mvn -T 1C -P ci clean compile -Dnodejs.workingDirectory="$ng1")
+          cp "$ng1/angular_orcid_generated.js" orcid-web/target/orcid-web/static/javascript/ng1Orcid/
+          echo "$VERSION" > orcid-web/target/orcid-web/static/version
+          rm -f orcid-web/target/orcid-web.war
+          (cd orcid-web/target/orcid-web && jar -cf ../orcid-web.war .)
+        fi
+        mvn --settings settings-deploy.xml --file "$MODULE/pom.xml" -Dmaven.test.skip \
+          -DaltReleaseDeploymentRepository="github::$ARTIFACT_URL$ARTIFACT_REPO_PATH" deploy
+    secrets:
+      env-vars: |
+        ARTIFACT_URL=${{ secrets.ARTIFACT_URL }}
+        ARTIFACT_REPO_PATH=${{ secrets.ARTIFACT_REPO_PATH }}
+        ARTIFACT_USER=${{ secrets.ARTIFACT_USER }}
+        ARTIFACT_PASSWORD=${{ secrets.ARTIFACT_PASSWORD }}
+
+  bld_docker:
+    needs: version
+    permissions:
+      contents: read
+    uses: ORCID-dev/public-reusable-workflows/.github/workflows/docker.yml@v1
+    with:
+      name: bld_docker
+      images: >-
+        [{"name": "orcid/registry/orcid-web", "file": "orcid-web/Dockerfile"},
+        {"name": "orcid/registry/orcid-web-proxy", "file": "orcid-web-proxy/Dockerfile"},
+        {"name": "orcid/registry/orcid-haprouter", "file": "orcid-haprouter/Dockerfile"}]
+      version: ${{ needs.version.outputs.version }}
+      push: true
+    secrets:
+      registry: ${{ secrets.DOCKER_REGISTRY }}
+      username: ${{ secrets.DOCKER_USER }}
+      password: ${{ secrets.DOCKER_PASSWORD }}
+
+  release:
+    needs: [version, bld_mvn, bld_docker]
+    if: github.event_name == 'push' || inputs.release
+    permissions:
+      contents: write
+    uses: ORCID-dev/public-reusable-workflows/.github/workflows/release.yml@v1
+    with:
+      tag: ${{ needs.version.outputs.tag }}
+      previous-tag: ${{ needs.version.outputs.last-tag }}
+      slack-channel: tech-release
+    secrets:
+      slack-token: ${{ secrets.SLACKTEE_TOKEN }}
